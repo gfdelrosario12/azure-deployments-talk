@@ -32,8 +32,6 @@ function wrapText(text: string, maxPx: number, charPx: number): string[] {
 }
 
 // ── layout ────────────────────────────────────────────────────────────────────
-// When there are more than MAX_COLS columns, fold into 2 rows of roughly equal
-// length so the diagram stays readable without becoming a tiny horizontal strip.
 const MAX_COLS = 4;
 
 function layout(
@@ -41,7 +39,6 @@ function layout(
   edges: DiagramData['edges'],
   NW: number, NH: number, CGAP: number, RGAP: number,
 ) {
-  // BFS column assignment
   const inDeg: Record<string, number> = {};
   nodes.forEach((n) => (inDeg[n.id] = 0));
   edges.forEach((e) => (inDeg[e.to] = (inDeg[e.to] ?? 0) + 1));
@@ -61,52 +58,38 @@ function layout(
   nodes.forEach((n) => { if (colOf[n.id] === undefined) colOf[n.id] = 0; });
 
   const numBfsCols = Math.max(...Object.values(colOf)) + 1;
-
-  // If too many columns, fold: remap BFS columns into a 2-row grid
-  // Row 0 gets cols 0..ceil(n/2)-1, Row 1 gets the rest (shifted back to col 0..)
-  let effectiveColOf = { ...colOf };
-  let effectiveRowOf: Record<string, number> = {};
+  const effectiveColOf = { ...colOf };
+  const effectiveRowOf: Record<string, number> = {};
   let numCols: number;
 
   if (numBfsCols > MAX_COLS) {
     const half = Math.ceil(numBfsCols / 2);
     nodes.forEach((n) => {
       const bc = colOf[n.id];
-      if (bc < half) {
-        effectiveColOf[n.id] = bc;
-        effectiveRowOf[n.id] = 0;
-      } else {
-        effectiveColOf[n.id] = bc - half;
-        effectiveRowOf[n.id] = 1;
-      }
+      effectiveColOf[n.id] = bc < half ? bc : bc - half;
+      effectiveRowOf[n.id] = bc < half ? 0 : 1;
     });
     numCols = half;
   } else {
-    // Standard: row assignment within each BFS column (for fan-out nodes)
     const colGroups: Record<number, string[]> = {};
     nodes.forEach((n) => { const c = colOf[n.id]; (colGroups[c] = colGroups[c] ?? []).push(n.id); });
     Object.values(colGroups).forEach((ids) => ids.forEach((id, i) => (effectiveRowOf[id] = i)));
     numCols = numBfsCols;
   }
 
-  // Compute pixel centres
-  // In folded mode each "row" is a horizontal band; in standard mode rows are
-  // vertical stacks within a column.
   const cx: Record<string, number> = {};
   const cy: Record<string, number> = {};
 
   if (numBfsCols > MAX_COLS) {
-    // 2-band layout: row 0 on top, row 1 on bottom
     const BAND_GAP = RGAP * 3;
     nodes.forEach((n) => {
       cx[n.id] = effectiveColOf[n.id] * (NW + CGAP) + NW / 2;
       cy[n.id] = effectiveRowOf[n.id] * (NH + BAND_GAP) + NH / 2;
     });
   } else {
-    // Standard stacked layout
     const colGroups: Record<number, string[]> = {};
     nodes.forEach((n) => { const c = effectiveColOf[n.id]; (colGroups[c] = colGroups[c] ?? []).push(n.id); });
-    const maxRows = Math.max(...Object.values(effectiveRowOf)) + 1;
+    const maxRows = Math.max(...Object.values(effectiveRowOf), 0) + 1;
     const totalH = maxRows * NH + (maxRows - 1) * RGAP;
     nodes.forEach((n) => {
       const c = effectiveColOf[n.id], r = effectiveRowOf[n.id];
@@ -119,8 +102,90 @@ function layout(
   }
 
   const totalW = numCols * NW + (numCols - 1) * CGAP;
-  const totalH = Math.max(...Object.values(cy)) + NH / 2;
+  const totalH = Math.max(...Object.values(cy), 0) + NH / 2;
   return { cx, cy, totalW, totalH };
+}
+
+// ── edge routing ──────────────────────────────────────────────────────────────
+// Returns an SVG path `d` string and a label anchor point {lx, ly}.
+// Strategy:
+//   - Determine exit/entry faces based on relative position of node centres.
+//   - Forward (left→right): exit right face, enter left face → cubic bezier.
+//   - Backward (right→left): exit top face, arc over the top → orthogonal U-turn.
+//   - Same column (top→bottom): exit bottom, enter top → straight vertical.
+//   - Same row (left→right adjacent): exit right, enter left → straight horizontal.
+//   - Diagonal (different row AND column): exit right/left, enter left/right → bezier elbow.
+
+function routeEdge(
+  x1: number, y1: number,  // source centre
+  x2: number, y2: number,  // target centre
+  NW: number, NH: number,
+  edgeIndex: number,        // for stagger offset among parallel edges
+  totalEdgesFromSource: number,
+): { d: string; lx: number; ly: number } {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const absDx = Math.abs(dx);
+  const absDy = Math.abs(dy);
+
+  // Stagger offset so parallel edges from same source don't overlap
+  const stagger = totalEdgesFromSource > 1
+    ? (edgeIndex - (totalEdgesFromSource - 1) / 2) * 10
+    : 0;
+
+  // ── Same row (horizontal) ──────────────────────────────────────────────────
+  if (absDy < 4) {
+    if (dx > 0) {
+      // forward horizontal
+      const ex1 = x1 + NW / 2, ex2 = x2 - NW / 2;
+      const sy = y1 + stagger;
+      const d = `M${ex1},${sy} L${ex2},${sy}`;
+      return { d, lx: (ex1 + ex2) / 2, ly: sy - 7 };
+    } else {
+      // backward horizontal — route over the top
+      const ex1 = x1 - NW / 2, ex2 = x2 + NW / 2;
+      const topY = Math.min(y1, y2) - NH * 0.8 - Math.abs(stagger);
+      const d = `M${ex1},${y1} C${ex1 - 20},${topY} ${ex2 + 20},${topY} ${ex2},${y2}`;
+      return { d, lx: (ex1 + ex2) / 2, ly: topY - 7 };
+    }
+  }
+
+  // ── Same column (vertical) ─────────────────────────────────────────────────
+  if (absDx < 4) {
+    if (dy > 0) {
+      const ey1 = y1 + NH / 2, ey2 = y2 - NH / 2;
+      const sx = x1 + stagger;
+      const d = `M${sx},${ey1} L${sx},${ey2}`;
+      return { d, lx: sx + 8, ly: (ey1 + ey2) / 2 };
+    } else {
+      // upward same column — route to the right
+      const ey1 = y1 - NH / 2, ey2 = y2 + NH / 2;
+      const rightX = x1 + NW / 2 + 24 + Math.abs(stagger);
+      const d = `M${x1},${ey1} C${rightX},${ey1} ${rightX},${ey2} ${x2},${ey2}`;
+      return { d, lx: rightX + 6, ly: (ey1 + ey2) / 2 };
+    }
+  }
+
+  // ── Forward diagonal (target is to the right) ─────────────────────────────
+  if (dx > 0) {
+    const ex1 = x1 + NW / 2;
+    const ex2 = x2 - NW / 2;
+    const mx = (ex1 + ex2) / 2;
+    // Exit right face at a y offset based on stagger
+    const sy = y1 + stagger;
+    const ty = y2;
+    const d = `M${ex1},${sy} C${mx},${sy} ${mx},${ty} ${ex2},${ty}`;
+    return { d, lx: mx, ly: (sy + ty) / 2 - 6 };
+  }
+
+  // ── Backward diagonal (target is to the left) ─────────────────────────────
+  // Route over the top: exit top of source, arc left, enter top of target
+  const topClearance = NH * 1.0 + Math.abs(stagger) * 2;
+  const topY = Math.min(y1, y2) - topClearance;
+  const ex1 = x1 - NW / 2;
+  const ex2 = x2 + NW / 2;
+  const d = `M${ex1},${y1} C${ex1 - 30},${topY} ${ex2 + 30},${topY} ${ex2},${y2}`;
+  return { d, lx: (x1 + x2) / 2, ly: topY - 7 };
 }
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -142,12 +207,28 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
 
   const { cx, cy, totalW, totalH } = layout(nodes, edges, NW, NH, CGAP, RGAP);
 
+  // Count outgoing edges per source node for stagger calculation
+  const outCount: Record<string, number> = {};
+  const outIndex: Record<string, number> = {};
+  edges.forEach((e) => { outCount[e.from] = (outCount[e.from] ?? 0) + 1; });
+  const tempIdx: Record<string, number> = {};
+  edges.forEach((e) => {
+    tempIdx[e.from] = tempIdx[e.from] ?? 0;
+    outIndex[`${e.from}->${e.to}`] = tempIdx[e.from]++;
+  });
+
+  // Extra vertical padding for backward edges that arc over the top
+  const extraTopPad = edges.some((e) => {
+    if (!cx[e.from] || !cx[e.to]) return false;
+    return cx[e.to] <= cx[e.from]; // backward or same-column-up
+  }) ? NH + 16 : 0;
+
   const PAD = 16;
   const vw = totalW + PAD * 2;
-  const vh = totalH + PAD * 2;
-  const ox = PAD, oy = PAD;
+  const vh = totalH + PAD * 2 + extraTopPad;
+  const ox = PAD;
+  const oy = PAD + extraTopPad; // shift nodes down to make room for arcs above
 
-  // minHeight keeps short single-row diagrams from collapsing
   const minHeightPx = NH + PAD * 2 + 40;
 
   return (
@@ -184,34 +265,19 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
 
         {/* ── edges ── */}
         {edges.map((edge, i) => {
-          if (!cx[edge.from] === undefined || cx[edge.to] === undefined) return null;
+          if (cx[edge.from] === undefined || cx[edge.to] === undefined) return null;
           const x1 = ox + cx[edge.from], y1 = oy + cy[edge.from];
           const x2 = ox + cx[edge.to],   y2 = oy + cy[edge.to];
-          const sameRow = Math.abs(y1 - y2) < 2;
-          const sameCol = Math.abs(x1 - x2) < 2;
-
-          let d: string, lx: number, ly: number;
-
-          if (sameRow) {
-            const ex1 = x1 + NW / 2, ex2 = x2 - NW / 2;
-            d = `M${ex1},${y1} L${ex2},${y2}`;
-            lx = (ex1 + ex2) / 2; ly = y1 - 6;
-          } else if (sameCol) {
-            const ey1 = y1 + NH / 2, ey2 = y2 - NH / 2;
-            d = `M${x1},${ey1} L${x2},${ey2}`;
-            lx = x1 + 5; ly = (ey1 + ey2) / 2;
-          } else {
-            const ex1 = x1 + NW / 2, ex2 = x2 - NW / 2;
-            const mx = (ex1 + ex2) / 2;
-            d = `M${ex1},${y1} C${mx},${y1} ${mx},${y2} ${ex2},${y2}`;
-            lx = mx; ly = (y1 + y2) / 2 - 5;
-          }
+          const eIdx = outIndex[`${edge.from}->${edge.to}`] ?? 0;
+          const eTotal = outCount[edge.from] ?? 1;
+          const { d, lx, ly } = routeEdge(x1, y1, x2, y2, NW, NH, eIdx, eTotal);
 
           return (
             <g key={i}>
               <path d={d} fill="none" stroke="#52525b" strokeWidth="1.5" markerEnd="url(#arr)" />
               {edge.label && (
-                <text x={lx} y={ly} textAnchor="middle" fontSize={7.5} fontFamily="monospace" fill="#a1a1aa">
+                <text x={lx} y={ly} textAnchor="middle" fontSize={7.5} fontFamily="monospace" fill="#a1a1aa"
+                  style={{ paintOrder: 'stroke', stroke: '#09090b', strokeWidth: 3 }}>
                   {edge.label}
                 </text>
               )}
