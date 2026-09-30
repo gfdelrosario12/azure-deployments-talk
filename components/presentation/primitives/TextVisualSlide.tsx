@@ -83,16 +83,19 @@ export function TextVisualSlide({ slide }: { slide: TextVisualSlideData }) {
               )}
               <div className="space-y-1.5">
                 {block.body.map((line, lIdx) => (
-                  <p
-                    key={lIdx}
-                    className={
-                      block.accent
-                        ? 'text-zinc-100 text-sm leading-relaxed'
-                        : 'text-zinc-200 text-sm leading-relaxed'
-                    }
-                  >
-                    {line}
-                  </p>
+                  block.bulleted ? (
+                    <div key={lIdx} className="flex items-start gap-2">
+                      <span className="text-cyan-400 font-mono shrink-0 mt-0.5 select-none">→</span>
+                      <p className={block.accent ? 'text-zinc-100 text-sm leading-relaxed' : 'text-zinc-200 text-sm leading-relaxed'}>{line}</p>
+                    </div>
+                  ) : (
+                    <p
+                      key={lIdx}
+                      className={block.accent ? 'text-zinc-100 text-sm leading-relaxed' : 'text-zinc-200 text-sm leading-relaxed'}
+                    >
+                      {line}
+                    </p>
+                  )
                 ))}
               </div>
               {block.highlight && (

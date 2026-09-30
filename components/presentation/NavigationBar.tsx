@@ -44,7 +44,7 @@ export function NavigationBar({
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-white">localhost:8080</span>
+            <span className="font-semibold text-white">localhost</span>
           </div>
 
           <span className="text-zinc-600 hidden sm:inline">|</span>

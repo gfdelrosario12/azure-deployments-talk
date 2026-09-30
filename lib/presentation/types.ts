@@ -76,6 +76,8 @@ export interface TextVisualSlideData extends BaseSlide {
     highlight?: string;
     /** Renders the block as an emphasised definition panel instead of a code example. */
     accent?: boolean;
+    /** Renders each body line with a bullet marker. */
+    bulleted?: boolean;
   }[];
   visualCards?: {
     title: string;

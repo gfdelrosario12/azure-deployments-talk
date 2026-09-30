@@ -3,10 +3,10 @@ import { SlideData } from './types';
 export const openingSlides: SlideData[] = [
   {
     id: 'opening-title',
-    title: 'Still on localhost:8080? Not Anymore!',
+    title: 'Still on localhost? Not Anymore!',
     section: 'Introduction',
     type: 'statement',
-    statement: 'Still on localhost:8080?\nNot Anymore!',
+    statement: 'Still on localhost?\nNot Anymore!',
     subtitle: 'Exploring Modern Deployment Methodologies with Microsoft Azure!',
     presentationLink: {
       label: 'Scan for this deck',
@@ -53,6 +53,7 @@ export const openingSlides: SlideData[] = [
     contentBlocks: [
       {
         heading: 'Gladwin Ferdz I. Del Rosario',
+        bulleted: true,
         body: [
           'IT Service Desk Intern at Dayforce.',
           'Cloud-focused full-stack application developer.',
@@ -60,6 +61,23 @@ export const openingSlides: SlideData[] = [
           '4th Year BS Computer Engineering Student — Specializing in Computer Networks Engineering at the Polytechnic University of the Philippines.',
         ],
         highlight: 'Currently surviving 3 AM thesis defense preparation — deployment is my least favorite part.',
+      },
+      {
+        heading: 'Certifications',
+        body: [
+          'Microsoft Azure Az-900 Certified.',
+          'x1 GCP, x1 Azure, x1 ISC2, x1 OCI, x1 SecOps Group, IBM & Google Certified Professional.',
+        ],
+      },
+      {
+        heading: 'Leadership',
+        bulleted: true,
+        body: [
+          'Former Student Leader in multiple tech organizations across PUP Main.',
+          'ICPEP SE — PUP Manila',
+          'Cisco NetConnect PUP',
+          'Google Developer Groups on Campus PUP',
+        ],
       },
     ],
     visualCards: [

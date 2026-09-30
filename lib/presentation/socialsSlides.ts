@@ -69,10 +69,10 @@ export const socialsSlides: SlideData[] = [
 
   {
     id: 'closing-title',
-    title: 'Still on localhost:8080? Not Anymore!',
+    title: 'Still on localhost? Not Anymore!',
     section: 'Closing',
     type: 'statement',
-    statement: 'Still on localhost:8080?\nNot Anymore!',
+    statement: 'Still on localhost?\nNot Anymore!',
     subtitle: 'Exploring Modern Deployment Methodologies with Microsoft Azure!',
     logos: [
       { src: '/assets/azug.jpg', alt: 'AZUG Philippines', className: 'rounded-md' },
