@@ -81,9 +81,11 @@ export const vmAppServiceSlides: SlideData[] = [
     contentBlocks: [
       {
         heading: 'What is a Dockerfile?',
+        accent: true,
         body: [
           'A plain-text recipe that describes exactly how to build a container image — OS base, runtime, dependencies, and startup command.',
           'Write it once. Run it identically on your laptop, a VM, or any cloud platform.',
+          'Four instructions describe your whole runtime: the base image, where the code goes, what it listens on, and how it starts.',
         ],
         highlight: 'No more "it works on my machine" — the container IS the machine.',
       },
@@ -98,16 +100,14 @@ export const vmAppServiceSlides: SlideData[] = [
         ],
       },
       {
-        heading: 'Next.js Dashboard (multi-stage)',
+        heading: 'Flutter App (built ahead of time)',
         body: [
-          'FROM node:20-alpine AS builder',
-          'WORKDIR /app && COPY package*.json ./',
-          'RUN npm ci && COPY . . && RUN npm run build',
+          'flutter build apk --release',
+          'flutter build ios --release',
           '',
-          'FROM node:20-alpine',
-          'WORKDIR /app',
-          'COPY --from=builder /app/.next/standalone ./',
-          'EXPOSE 3000 && CMD ["node", "server.js"]',
+          '# AOT-compiled binary — no runtime server',
+          '# Android: .apk / .aab  |  iOS: .ipa',
+          'Ship via Play Store / App Store',
         ],
       },
     ],
@@ -127,8 +127,9 @@ export const vmAppServiceSlides: SlideData[] = [
     speakerNotes: [
       'Before we go further, let me quickly show you what a Dockerfile actually looks like.',
       'A Dockerfile is just a text file that describes your application environment — the base image, the runtime, your code, and the startup command.',
+      'Four lines do it: what base image you start from, where your code lives, what port it listens on, and the command that starts it.',
       'For the Java Spring Boot API: start from a JRE Alpine image, copy the compiled JAR, expose port 8080, and run it.',
-      'For the Next.js dashboard: multi-stage build — first build the app, then copy only the output into a lean runtime image.',
+      'For the Flutter app: it compiles ahead of time to an AOT binary — an APK or App Bundle for Android, an IPA for iOS — which you ship through the Play Store or App Store rather than hosting on a server.',
       'The key insight: once you have a Dockerfile, you can deploy that container to a VM, App Service for Containers, Container Apps, or AKS — same image, everywhere.',
     ],
   },

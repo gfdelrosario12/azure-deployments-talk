@@ -62,23 +62,52 @@ export function TextVisualSlide({ slide }: { slide: TextVisualSlideData }) {
         {/* Text blocks */}
         <div className={`${textColSpan} space-y-4`}>
           {slide.contentBlocks.map((block, idx) => (
-            <div key={idx} className="p-4 rounded-lg border border-zinc-700/60 bg-zinc-900/50 space-y-2">
+            <div key={idx}>
+            <div
+              className={
+                block.accent
+                  ? 'p-5 rounded-xl border border-cyan-500/40 bg-cyan-950/20 space-y-2.5 shadow-[0_0_25px_rgba(6,182,212,0.08)]'
+                  : 'p-4 rounded-lg border border-zinc-700/60 bg-zinc-900/50 space-y-2'
+              }
+            >
               {block.heading && (
-                <h3 className="text-base font-semibold text-white font-mono flex items-center gap-2">
+                <h3
+                  className={
+                    block.accent
+                      ? 'text-lg font-bold text-white font-mono flex items-center gap-2'
+                      : 'text-base font-semibold text-white font-mono flex items-center gap-2'
+                  }
+                >
                   <span className="text-cyan-400">#</span> {block.heading}
                 </h3>
               )}
               <div className="space-y-1.5">
                 {block.body.map((line, lIdx) => (
-                  <p key={lIdx} className="text-zinc-200 text-sm leading-relaxed">{line}</p>
+                  <p
+                    key={lIdx}
+                    className={
+                      block.accent
+                        ? 'text-zinc-100 text-sm leading-relaxed'
+                        : 'text-zinc-200 text-sm leading-relaxed'
+                    }
+                  >
+                    {line}
+                  </p>
                 ))}
               </div>
               {block.highlight && (
-                <div className="pt-2 border-t border-zinc-700/50 font-mono text-xs text-amber-300">
+                <div
+                  className={
+                    block.accent
+                      ? 'pt-2.5 border-t border-cyan-500/25 font-mono text-xs text-amber-300'
+                      : 'pt-2 border-t border-zinc-700/50 font-mono text-xs text-amber-300'
+                  }
+                >
                   ⚡ {block.highlight}
                 </div>
               )}
             </div>
+          </div>
           ))}
         </div>
 

@@ -74,6 +74,8 @@ export interface TextVisualSlideData extends BaseSlide {
     heading?: string;
     body: string[];
     highlight?: string;
+    /** Renders the block as an emphasised definition panel instead of a code example. */
+    accent?: boolean;
   }[];
   visualCards?: {
     title: string;

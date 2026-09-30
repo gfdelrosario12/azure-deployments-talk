@@ -34,10 +34,14 @@ export function StatementSlide({ slide }: { slide: StatementSlideData }) {
       )}
 
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-tight font-mono max-w-5xl">
-        <span className="text-cyan-500 mr-3 select-none">&gt;</span>
-        <span className="bg-gradient-to-r from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent">
-          {slide.statement}
-        </span>
+        {slide.statement.split('\n').map((line, i) => (
+          <div key={i}>
+            {i === 0 && <span className="text-cyan-500 mr-3 select-none">&gt;</span>}
+            <span className="bg-gradient-to-r from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent">
+              {line}
+            </span>
+          </div>
+        ))}
       </h1>
 
       {slide.subtitle && (
@@ -53,7 +57,7 @@ export function StatementSlide({ slide }: { slide: StatementSlideData }) {
           rel="noopener noreferrer"
           className="mt-6 flex items-center gap-4 px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-950/15 hover:border-emerald-400/60 hover:bg-emerald-950/30 transition-colors"
         >
-          <QrCode src={slide.presentationLink.qrSrc} alt={`QR code for ${slide.presentationLink.label}`} size={64} />
+          <QrCode src={slide.presentationLink.qrSrc} alt={`QR code for ${slide.presentationLink.label}`} size={128} />
           <span className="text-left">
             <span className="block font-mono text-[10px] uppercase tracking-widest text-emerald-400/80">
               {slide.presentationLink.label}

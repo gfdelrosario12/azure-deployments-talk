@@ -113,6 +113,22 @@ export function NavigationBar({
           </button>
 
           <button
+            onClick={() => window.open('/audience', '_blank')}
+            className="px-2.5 py-1 rounded border border-emerald-500/40 bg-emerald-950/20 text-emerald-400 hover:text-emerald-200 hover:border-emerald-400 transition-colors hidden md:block text-[10px]"
+            title="Open Audience Window"
+          >
+            AUDIENCE ↗
+          </button>
+
+          <button
+            onClick={() => window.open('/presenter', '_blank')}
+            className="px-2.5 py-1 rounded border border-purple-500/40 bg-purple-950/20 text-purple-400 hover:text-purple-200 hover:border-purple-400 transition-colors hidden md:block text-[10px]"
+            title="Open Presenter Console"
+          >
+            PRESENTER ↗
+          </button>
+
+          <button
             onClick={onToggleNav}
             className="px-2.5 py-1 rounded border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-cyan-300 hover:border-cyan-500/50 transition-colors"
             title="Hide Navigation (M)"

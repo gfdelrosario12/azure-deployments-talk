@@ -66,4 +66,26 @@ export const socialsSlides: SlideData[] = [
       'And if you want to revisit this deck later, scan the last code for the live version of this presentation.',
     ],
   },
+
+  {
+    id: 'closing-title',
+    title: 'Still on localhost:8080? Not Anymore!',
+    section: 'Closing',
+    type: 'statement',
+    statement: 'Still on localhost:8080?\nNot Anymore!',
+    subtitle: 'Exploring Modern Deployment Methodologies with Microsoft Azure!',
+    logos: [
+      { src: '/assets/azug.jpg', alt: 'AZUG Philippines', className: 'rounded-md' },
+      { src: '/assets/jugph.png', alt: 'JUG Philippines' },
+    ],
+    presentationLink: {
+      label: 'Scan for this deck',
+      url: 'https://azuredeployments-gladwindr.vercel.app/',
+      qrSrc: '/assets/qr/presentation.svg',
+    },
+    speakerNotes: [
+      'Thank you everyone — that is a wrap!',
+      'Scan the QR code to get the live version of this presentation.',
+    ],
+  },
 ];
