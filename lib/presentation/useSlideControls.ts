@@ -7,9 +7,10 @@ interface SlideControlsOptions {
   totalSlides: number;
   initialSlide?: number;
   role?: 'presenter' | 'audience' | 'remote';
+  credential?: string | null;
 }
 
-export function useSlideControls({ totalSlides, initialSlide = 0, role = 'presenter' }: SlideControlsOptions) {
+export function useSlideControls({ totalSlides, initialSlide = 0, role = 'presenter', credential }: SlideControlsOptions) {
   const [currentSlide, setCurrentSlideState] = useState(initialSlide);
   const [showNotes, setShowNotes] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -19,29 +20,35 @@ export function useSlideControls({ totalSlides, initialSlide = 0, role = 'presen
     setCurrentSlideState(Math.max(0, Math.min(index, totalSlides - 1)));
   }, [totalSlides]);
 
-  const { broadcast } = usePresentationChannel(role, currentSlide, goToSlide);
+  const { publish, pairing, connected } = usePresentationChannel(
+    role,
+    currentSlide,
+    goToSlide,
+    credential,
+    totalSlides,
+  );
 
   const nextSlide = useCallback(() => {
     setCurrentSlideState((prev) => {
       const next = Math.min(prev + 1, totalSlides - 1);
-      broadcast({ type: 'GOTO', slide: next });
+      publish(next);
       return next;
     });
-  }, [totalSlides, broadcast]);
+  }, [totalSlides, publish]);
 
   const prevSlide = useCallback(() => {
     setCurrentSlideState((prev) => {
       const next = Math.max(prev - 1, 0);
-      broadcast({ type: 'GOTO', slide: next });
+      publish(next);
       return next;
     });
-  }, [broadcast]);
+  }, [publish]);
 
   const goToSlideAndBroadcast = useCallback((index: number) => {
     const next = Math.max(0, Math.min(index, totalSlides - 1));
     setCurrentSlideState(next);
-    broadcast({ type: 'GOTO', slide: next });
-  }, [totalSlides, broadcast]);
+    publish(next);
+  }, [totalSlides, publish]);
 
   const toggleNotes = useCallback(() => setShowNotes((p) => !p), []);
   const toggleNav    = useCallback(() => setShowNav((p) => !p), []);
@@ -82,6 +89,8 @@ export function useSlideControls({ totalSlides, initialSlide = 0, role = 'presen
     toggleFullscreen,
     showNav,
     toggleNav,
+    pairing,
+    connected,
     progressPercent: totalSlides > 1 ? (currentSlide / (totalSlides - 1)) * 100 : 100,
   };
 }

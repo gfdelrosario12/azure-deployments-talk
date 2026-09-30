@@ -4,6 +4,7 @@ import React from 'react';
 import { presentationSlides } from '@/lib/presentation/slides';
 import { useSlideControls } from '@/lib/presentation/useSlideControls';
 import { renderSlide } from '@/components/presentation/PresentationViewport';
+import { PairingPanel } from '@/components/presentation/primitives/PairingPanel';
 
 export default function PresenterPage() {
   const slides = presentationSlides;
@@ -15,6 +16,8 @@ export default function PresenterPage() {
     showNotes,
     toggleNotes,
     progressPercent,
+    pairing,
+    connected,
   } = useSlideControls({ totalSlides: slides.length, role: 'presenter' });
 
   const active = slides[currentSlide];
@@ -27,21 +30,12 @@ export default function PresenterPage() {
       <header className="shrink-0 h-10 flex items-center justify-between px-4 bg-black border-b border-zinc-800 text-xs">
         <span className="text-cyan-400 font-bold tracking-widest uppercase">Presenter View</span>
         <div className="flex items-center gap-3">
-          <span className="text-zinc-400">
-            Slide <span className="text-white font-bold">{currentSlide + 1}</span>
-            <span className="text-zinc-600"> / {slides.length}</span>
-          </span>
+          <PairingPanel pairing={pairing} connected={connected} />
           <button
             onClick={() => window.open('/audience', '_blank')}
             className="px-2.5 py-1 rounded border border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-950/60 transition-colors text-[10px] uppercase tracking-wider"
           >
-            Open Audience Window ↗
-          </button>
-          <button
-            onClick={() => window.open('/remote', '_blank')}
-            className="px-2.5 py-1 rounded border border-purple-500/40 bg-purple-950/30 text-purple-300 hover:bg-purple-950/60 transition-colors text-[10px] uppercase tracking-wider"
-          >
-            Remote QR ↗
+            Audience ↗
           </button>
         </div>
       </header>

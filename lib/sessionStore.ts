@@ -2,7 +2,6 @@
 
 export interface Session {
   id: string;
-  pin: string;
   slide: number;
   total: number;
   createdAt: number;
@@ -10,17 +9,17 @@ export interface Session {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var __sessions: Map<string, Session> | undefined;
-  // eslint-disable-next-line no-var
-  var __pinIndex: Map<string, string> | undefined;
 }
 
 export const sessions: Map<string, Session> =
   globalThis.__sessions ?? (globalThis.__sessions = new Map());
 
-export const pinIndex: Map<string, string> =
-  globalThis.__pinIndex ?? (globalThis.__pinIndex = new Map());
+/**
+ * The single secret that unlocks remote control.
+ * Override in production with PRESENTATION_PIN. Never sent to any client.
+ */
+export const REMOTE_PIN: string = process.env.PRESENTATION_PIN || '040202';
 
 function randomId(len: number, chars: string) {
   let out = '';
@@ -29,21 +28,48 @@ function randomId(len: number, chars: string) {
 }
 
 export function createSession(total: number): Session {
-  const id  = randomId(12, 'abcdefghijklmnopqrstuvwxyz0123456789');
-  let pin: string;
-  do { pin = randomId(6, '0123456789'); } while (pinIndex.has(pin));
+  const id = randomId(12, 'abcdefghijklmnopqrstuvwxyz0123456789');
 
-  const session: Session = { id, pin, slide: 0, total, createdAt: Date.now(), listeners: new Set() };
+  const session: Session = { id, slide: 0, total, createdAt: Date.now(), listeners: new Set() };
   sessions.set(id, session);
-  pinIndex.set(pin, id);
 
-  // Clean up sessions older than 12 hours
+  // Drop sessions older than 12 hours
   const cutoff = Date.now() - 12 * 60 * 60 * 1000;
   for (const [sid, s] of sessions) {
-    if (s.createdAt < cutoff) { pinIndex.delete(s.pin); sessions.delete(sid); }
+    if (s.createdAt < cutoff) sessions.delete(sid);
   }
 
   return session;
+}
+
+/** The most recently created session — the live deck the remote should drive. */
+export function activeSession(): Session | undefined {
+  let latest: Session | undefined;
+  for (const s of sessions.values()) {
+    if (!latest || s.createdAt > latest.createdAt) latest = s;
+  }
+  return latest;
+}
+
+/** Constant-time-ish compare so the PIN does not leak by response timing. */
+function pinMatches(candidate: string): boolean {
+  if (typeof candidate !== 'string' || candidate.length !== REMOTE_PIN.length) return false;
+  let diff = 0;
+  for (let i = 0; i < REMOTE_PIN.length; i++) {
+    diff |= candidate.charCodeAt(i) ^ REMOTE_PIN.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+/**
+ * Resolve a caller to the live session.
+ * Accepts either the secret PIN or a known session id (used by the QR link).
+ * Returns undefined for anything else.
+ */
+export function resolveSession(credential: string): Session | undefined {
+  if (!credential) return undefined;
+  if (pinMatches(credential)) return activeSession();
+  return sessions.get(credential);
 }
 
 export function pushToListeners(session: Session, data: object) {
@@ -51,13 +77,6 @@ export function pushToListeners(session: Session, data: object) {
   for (const ctrl of session.listeners) {
     try { ctrl.enqueue(payload); } catch { session.listeners.delete(ctrl); }
   }
-}
-
-/** Resolve a session by its id, or by the 6-digit PIN. */
-export function resolveSession(idOrPin: string): Session | undefined {
-  const id = /^[0-9]{6}$/.test(idOrPin) ? pinIndex.get(idOrPin) : idOrPin;
-  if (!id) return undefined;
-  return sessions.get(id);
 }
 
 /** Apply a command from a remote and fan the new state out to every listener. */
