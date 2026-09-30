@@ -6,57 +6,46 @@ import { DiagramEngine } from '../DiagramEngine';
 
 export function ArchitectureDiagramSlide({ slide }: { slide: ArchitectureSlideData }) {
   return (
-    <div className="flex flex-col justify-center min-h-[70vh] px-6 sm:px-12 max-w-6xl mx-auto animate-fadeIn">
+    <div className="px-8 sm:px-14 py-6 max-w-7xl mx-auto w-full animate-fadeIn overflow-hidden">
+
       {/* Header */}
-      <div className="mb-6 border-b border-zinc-800 pb-4 flex items-baseline justify-between">
+      <div className="mb-5 border-b border-zinc-700/60 pb-4 flex items-baseline justify-between">
         <div>
-          <span className="font-mono text-xs text-purple-400 tracking-wider uppercase block mb-1">
-            {slide.section} {'// ARCHITECTURE'}
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">{slide.title}</h2>
+          <span className="mt-2 inline-block font-mono text-xs tracking-widest uppercase text-cyan-400/70 border border-cyan-500/25 bg-cyan-950/30 px-2.5 py-0.5 rounded">
+            {slide.section}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">
-            {slide.title}
-          </h2>
         </div>
         {slide.motifBadge && (
-          <span className="hidden sm:inline-block font-mono text-xs px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
+          <span className="hidden sm:inline-block font-mono text-sm px-3 py-1 rounded bg-zinc-900 border border-zinc-700 text-zinc-300">
             {slide.motifBadge}
           </span>
         )}
       </div>
 
-      <p className="text-lg text-zinc-300 mb-8 max-w-3xl leading-relaxed">
-        {slide.summary}
-      </p>
+      <p className="text-base text-zinc-200 mb-5 leading-relaxed max-w-4xl">{slide.summary}</p>
 
-      {/* Primary Diagram */}
-      <div className="mb-6">
-        <DiagramEngine diagram={slide.diagram} />
-      </div>
+      <DiagramEngine diagram={slide.diagram} />
 
-      {/* Secondary / Variant Diagram if present */}
       {slide.secondaryDiagram && (
-        <div className="mt-4 pt-4 border-t border-zinc-800/80">
-          <div className="font-mono text-xs text-zinc-400 uppercase mb-3">
-            {'// Containerized Variation'}
-          </div>
+        <div className="mt-5 pt-4 border-t border-zinc-700/60">
+          <div className="font-mono text-xs text-zinc-400 uppercase mb-2">// Containerized Variation</div>
           <DiagramEngine diagram={slide.secondaryDiagram} />
         </div>
       )}
 
-      {/* Architecture Highlights / Key takeaways */}
       {slide.highlights && slide.highlights.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-3">
-          {slide.highlights.map((highlight, idx) => (
-            <div
-              key={idx}
-              className="px-3 py-1.5 rounded bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 flex items-center gap-2"
-            >
+        <div className="mt-5 flex flex-wrap gap-2">
+          {slide.highlights.map((h, idx) => (
+            <div key={idx} className="px-3 py-2 rounded bg-zinc-900/80 border border-purple-500/30 text-sm font-mono text-zinc-100 flex items-center gap-2 shadow-[0_0_8px_rgba(168,85,247,0.08)]">
               <span className="text-purple-400">❖</span>
-              {highlight}
+              {h}
             </div>
           ))}
         </div>
       )}
+
+      <div className="mt-5 w-20 h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent" />
     </div>
   );
 }

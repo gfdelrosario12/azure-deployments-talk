@@ -7,15 +7,12 @@ export function ClosingTakeawaySlide({ slide }: { slide: ClosingTakeawaySlideDat
   return (
     <div className="flex flex-col justify-center min-h-[70vh] px-6 sm:px-12 max-w-5xl mx-auto animate-fadeIn">
       <div className="mb-8 border-b border-zinc-800 pb-4 text-center">
-        <span className="font-mono text-xs text-cyan-400 tracking-wider uppercase block mb-1">
-          {slide.section} {'// KEY TAKEAWAYS'}
-        </span>
         <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">
           {slide.title}
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+      <div className="grid grid-cols-1 gap-5 my-6 max-w-3xl mx-auto w-full">
         {slide.takeaways.map((takeaway, idx) => (
           <div
             key={idx}
@@ -37,6 +34,9 @@ export function ClosingTakeawaySlide({ slide }: { slide: ClosingTakeawaySlideDat
           </div>
         </div>
       )}
+
+      {/* Bottom accent line */}
+      <div className="mt-8 w-24 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent mx-auto" />
     </div>
   );
 }

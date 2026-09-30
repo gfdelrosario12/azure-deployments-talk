@@ -10,6 +10,8 @@ import { ComparisonSlide } from './primitives/ComparisonSlide';
 import { QuestionRevealSlide } from './primitives/QuestionRevealSlide';
 import { CaseStudySlide } from './primitives/CaseStudySlide';
 import { ClosingTakeawaySlide } from './primitives/ClosingTakeawaySlide';
+import { ImageSlide } from './primitives/ImageSlide';
+import { SocialsSlide } from './primitives/SocialsSlide';
 import { NavigationBar } from './NavigationBar';
 import { useSlideControls } from '@/lib/presentation/useSlideControls';
 
@@ -25,7 +27,10 @@ export function PresentationViewport({ slides, initialSlide = 0 }: PresentationV
     prevSlide,
     showNotes,
     toggleNotes,
+    isFullscreen,
     toggleFullscreen,
+    showNav,
+    toggleNav,
     progressPercent,
   } = useSlideControls({ totalSlides: slides.length, initialSlide });
 
@@ -33,85 +38,99 @@ export function PresentationViewport({ slides, initialSlide = 0 }: PresentationV
 
   const renderSlideContent = (slide: SlideData) => {
     switch (slide.type) {
-      case 'statement':
-        return <StatementSlide slide={slide} />;
-      case 'section-header':
-        return <SectionHeaderSlide slide={slide} />;
-      case 'text-visual':
-        return <TextVisualSlide slide={slide} />;
-      case 'architecture':
-        return <ArchitectureDiagramSlide slide={slide} />;
-      case 'comparison':
-        return <ComparisonSlide slide={slide} />;
-      case 'question-reveal':
-        return <QuestionRevealSlide slide={slide} />;
-      case 'case-study':
-        return <CaseStudySlide slide={slide} />;
-      case 'closing-takeaway':
-        return <ClosingTakeawaySlide slide={slide} />;
-      default:
-        return <div>Unsupported slide type</div>;
+      case 'statement':      return <StatementSlide slide={slide} />;
+      case 'section-header': return <SectionHeaderSlide slide={slide} />;
+      case 'text-visual':    return <TextVisualSlide slide={slide} />;
+      case 'architecture':   return <ArchitectureDiagramSlide slide={slide} />;
+      case 'comparison':     return <ComparisonSlide slide={slide} />;
+      case 'question-reveal':return <QuestionRevealSlide slide={slide} />;
+      case 'case-study':     return <CaseStudySlide slide={slide} />;
+      case 'closing-takeaway':return <ClosingTakeawaySlide slide={slide} />;
+      case 'image':          return <ImageSlide slide={slide} />;
+      case 'socials':        return <SocialsSlide slide={slide} />;
+      default:               return <div>Unsupported slide type</div>;
     }
   };
 
-  return (
-    <div className="min-h-screen bg-black text-zinc-100 flex flex-col justify-between selection:bg-cyan-500/30 selection:text-cyan-200">
-      <NavigationBar
-        currentSlide={currentSlide}
-        totalSlides={slides.length}
-        sectionTitle={activeSlide?.section || ''}
-        motifBadge={activeSlide?.motifBadge}
-        showNotes={showNotes}
-        onToggleNotes={toggleNotes}
-        onPrev={prevSlide}
-        onNext={nextSlide}
-        onToggleFullscreen={toggleFullscreen}
-        progressPercent={progressPercent}
-      />
+  // Nav bar is 58px (h-14 = 56px + 2px progress bar)
+  const NAV_H = 58;
 
-      {/* Main Slide Stage */}
-      <main className="flex-1 flex items-center justify-center pt-16 pb-12 px-4 relative overflow-hidden">
-        {/* Subtle grid backdrop */}
+  return (
+    <div className="h-screen h-[100dvh] overflow-hidden bg-black text-zinc-100 flex flex-col relative selection:bg-cyan-500/30 selection:text-cyan-200">
+
+      {/* ── Slide stage ── */}
+      <main
+        className="flex-1 min-h-0 relative overflow-hidden"
+        style={{ paddingBottom: showNav ? NAV_H : 0 }}
+      >
+        {/* grid backdrop */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.02]"
           style={{
-            backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
+            backgroundImage: 'linear-gradient(to right,#fff 1px,transparent 1px),linear-gradient(to bottom,#fff 1px,transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
-
-        <div className="w-full relative z-10">
-          {activeSlide && renderSlideContent(activeSlide)}
+        {/* slide content — natural size, clipped not scrolled */}
+        <div className="relative z-10 w-full h-full overflow-y-auto overflow-x-hidden flex items-center justify-center px-4 py-4">
+          {activeSlide && (
+            <div key={activeSlide.id} className="w-full">{renderSlideContent(activeSlide)}</div>
+          )}
         </div>
       </main>
 
-      {/* Speaker Notes Drawer */}
+      {/* ── Nav bar pinned to bottom of viewport ── */}
+      <div
+        className={`fixed bottom-0 inset-x-0 z-50 transition-transform duration-300 ease-in-out ${
+          showNav ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
+        <NavigationBar
+          currentSlide={currentSlide}
+          totalSlides={slides.length}
+          sectionTitle={activeSlide?.section || ''}
+          motifBadge={activeSlide?.motifBadge}
+          showNotes={showNotes}
+          onToggleNotes={toggleNotes}
+          onPrev={prevSlide}
+          onNext={nextSlide}
+          onToggleFullscreen={toggleFullscreen}
+          onToggleNav={toggleNav}
+          progressPercent={progressPercent}
+        />
+      </div>
+
+      {/* ── Speaker Notes Drawer ── */}
       {showNotes && activeSlide?.speakerNotes && (
-        <aside className="fixed bottom-0 left-0 right-0 max-h-72 overflow-y-auto bg-zinc-950/95 border-t border-cyan-500/40 p-6 z-40 shadow-2xl backdrop-blur-md">
-          <div className="max-w-5xl mx-auto space-y-3">
+        <aside className="fixed bottom-[58px] left-0 right-0 max-h-56 overflow-y-auto bg-zinc-950/95 border-t border-cyan-500/40 px-6 py-4 z-40 shadow-2xl backdrop-blur-md">
+          <div className="max-w-5xl mx-auto space-y-2">
             <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
               <div className="font-mono text-xs text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-2">
-                <span>🎙 PRESENTER SCRIPT // SLIDE {currentSlide + 1}</span>
+                <span>🎙 SCRIPT // SLIDE {currentSlide + 1}</span>
                 <span className="text-zinc-600">|</span>
                 <span className="text-zinc-300">{activeSlide.title}</span>
               </div>
-              <button
-                onClick={toggleNotes}
-                className="text-zinc-500 hover:text-zinc-300 font-mono text-xs"
-              >
+              <button onClick={toggleNotes} className="text-zinc-500 hover:text-zinc-300 font-mono text-xs">
                 [ CLOSE ]
               </button>
             </div>
-
-            <div className="space-y-2 text-zinc-300 text-sm leading-relaxed font-sans">
+            <div className="space-y-1.5 text-zinc-300 text-xs leading-relaxed font-sans">
               {activeSlide.speakerNotes.map((note, idx) => (
-                <p key={idx} className="border-l-2 border-cyan-500/30 pl-3">
-                  {note}
-                </p>
+                <p key={idx} className="border-l-2 border-cyan-500/30 pl-3">{note}</p>
               ))}
             </div>
           </div>
         </aside>
+      )}
+
+      {!showNav && (
+        <button
+          onClick={toggleNav}
+          title="Show Navigation (M)"
+          className="fixed bottom-2 right-2 z-50 px-2.5 py-1.5 rounded bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-cyan-300 hover:border-cyan-500/60 font-mono text-[10px] transition-colors"
+        >
+          NAV [M]
+        </button>
       )}
     </div>
   );

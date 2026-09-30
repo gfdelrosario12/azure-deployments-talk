@@ -9,9 +9,6 @@ export function QuestionRevealSlide({ slide }: { slide: QuestionRevealSlideData 
   return (
     <div className="flex flex-col justify-center min-h-[70vh] px-6 sm:px-12 max-w-5xl mx-auto animate-fadeIn">
       <div className="mb-6 border-b border-zinc-800 pb-4">
-        <span className="font-mono text-xs text-emerald-400 tracking-wider uppercase block mb-1">
-          {slide.section} {'// AUDIENCE INTERACTION'}
-        </span>
         <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">
           {slide.question}
         </h2>
@@ -56,6 +53,9 @@ export function QuestionRevealSlide({ slide }: { slide: QuestionRevealSlideData 
           </div>
         )}
       </div>
+
+      {/* Bottom accent line */}
+      <div className="mt-6 w-24 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto" />
     </div>
   );
 }

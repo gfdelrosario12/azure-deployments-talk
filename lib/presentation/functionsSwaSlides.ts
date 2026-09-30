@@ -1,250 +1,134 @@
 import { SlideData } from './types';
 
 export const functionsSwaSlides: SlideData[] = [
-  // SECTION HEADER: Functions & Static Web Apps
+  // ── 3. AZURE FUNCTIONS ────────────────────────────────────────────────────
+
   {
-    id: 'functions-swa-section-header',
-    title: 'Azure Functions & Static Web Apps',
-    section: 'Serverless & Modern Web',
-    type: 'section-header',
-    sectionNumber: '04',
-    description: 'Event-driven compute, decoupled frontends, and serverless hosting architectures.',
-    motifBadge: 'Serverless & Static Web',
+    id: 'functions-statement',
+    title: 'Azure Functions',
+    section: 'Azure Functions (Serverless)',
+    type: 'statement',
+    statement: 'Deploy individual functions. Run them only when triggered.',
+    subtitle: 'Serverless — no server management, no 24/7 idle cost.',
+    motifBadge: 'Serverless // Event-Driven',
+    logos: [{ src: '/assets/icons/azure-functions.svg', alt: 'Azure Functions' }],
     speakerNotes: [
-      'Now, we go one step further into serverless architecture with Azure Functions and Static Web Apps.',
-      'In this section, we transition away from continuously running server instances to event-driven compute and decoupled frontend architectures.',
+      'Now, we go one step further with Azure Functions.',
+      'Azure Functions moves us into a serverless approach. Serverless does not mean there are no servers — there are still servers running our code. We just do not have to manage them ourselves.',
+      'Instead of deploying an entire application and keeping it running 24/7, we deploy individual functions that run when something triggers them.',
     ],
   },
 
-  // PART 1: AZURE FUNCTIONS
   {
-    id: 'functions-statement-intro',
-    title: 'Azure Functions: Going One Step Further',
-    section: 'Azure Functions (Serverless)',
-    type: 'statement',
-    statement: 'Now, we go one step further with Azure Functions.',
-    subtitle: 'From continuously running compute to on-demand, event-driven execution.',
-    motifBadge: 'Event-Driven Compute',
-    speakerNotes: [
-      'Now, we go one step further with Azure Functions.',
-      'Up until now, whether using a VM or App Service, we assumed a server is constantly running and waiting for traffic.',
-      'Azure Functions turns this on its head: your code only runs when something triggers it.',
-    ],
-  },
-  {
-    id: 'functions-event-driven-model',
-    title: 'The Event-Driven Model',
-    section: 'Azure Functions (Serverless)',
-    type: 'text-visual',
-    motifBadge: 'Trigger → Compute → Output',
-    contentBlocks: [
-      {
-        heading: 'Traditional vs Event-Driven Compute',
-        body: [
-          'Traditional applications run 24/7, continuously listening on a port and consuming compute resources even when idle.',
-          'Azure Functions executes code in response to specific system events, scaling instantly to zero when idle and rapidly expanding during peak load.',
-        ],
-        highlight: 'Pay and compute only for the milliseconds your function is actively executing.',
-      },
-      {
-        heading: 'Diverse Trigger Ecosystem',
-        body: [
-          'Built-in bindings handle HTTP requests, message queues, blob uploads, database changes, timers, and webhooks without boilerplate connection logic.',
-        ],
-      },
-    ],
-    visualCards: [
-      {
-        title: 'SUPPORTED TRIGGERS',
-        tag: 'BINDINGS',
-        items: [
-          'HTTP Request (REST / Webhook)',
-          'Timer / Scheduled Cron',
-          'Azure Queue / Service Bus',
-          'Blob Storage Upload',
-          'Cosmos DB Change Feed',
-          'Event Grid & Event Hubs',
-        ],
-      },
-      {
-        title: 'EXECUTION CONTRAST',
-        tag: 'PARADIGM',
-        items: [
-          'App Service: Always-running server',
-          'Functions: Event → Execute → Sleep',
-          'Scaling: 0 to thousands of instances',
-          'Billing: Sub-second execution time',
-        ],
-      },
-    ],
-    speakerNotes: [
-      'Let us contrast the traditional model with the event-driven model.',
-      'In a traditional application, you have an always-running backend server. It sits there, listening for requests, consuming CPU and memory whether you have 10,000 visitors or zero.',
-      'With Azure Functions, your code wakes up on an event: an HTTP request, a message in a queue, a file uploaded to Blob storage, or a scheduled timer. It executes, produces a response or action, and shuts down. Depending on your hosting plan, it scales automatically from zero to thousands of concurrent executions.',
-    ],
-  },
-  {
-    id: 'functions-execution-flow-diagram',
-    title: 'Event-Driven Execution Flow',
+    id: 'functions-architecture',
+    title: 'Azure Functions: Event-Driven Execution',
     section: 'Azure Functions (Serverless)',
     type: 'architecture',
-    motifBadge: 'Architecture: Event-Driven',
+    motifBadge: 'Architecture: Functions',
     summary:
-      'Contrasting the always-running backend server against the on-demand event-triggered execution model of Azure Functions using a lightweight calculation API.',
+      'A function wakes up when triggered — HTTP request, queue message, file upload, or scheduled timer — executes, and shuts down. Azure handles scaling automatically.',
     diagram: {
       nodes: [
-        { id: 'client', label: 'User / Event', sublabel: 'HTTP / Queue / File', type: 'user' },
-        { id: 'trigger', label: 'Azure Trigger', sublabel: 'Event Router', type: 'network' },
-        { id: 'fn', label: 'Azure Function', sublabel: 'On-Demand Compute', type: 'compute' },
-        { id: 'db', label: 'Database / Queue', sublabel: 'Output Binding', type: 'storage' },
+        { id: 'triggers', label: 'Triggers', sublabel: 'HTTP / Queue / File / Timer', type: 'user' },
+        { id: 'fn', label: 'Azure Function', sublabel: 'On-Demand Execution', type: 'compute' },
+        { id: 'output', label: 'Output / Response', sublabel: 'DB / Queue / HTTP', type: 'storage' },
       ],
       edges: [
-        { from: 'client', to: 'trigger', label: 'triggers event' },
-        { from: 'trigger', to: 'fn', label: 'invokes execution' },
-        { from: 'fn', to: 'db', label: 'persists / outputs' },
+        { from: 'triggers', to: 'fn', label: 'invokes' },
+        { from: 'fn', to: 'output', label: 'returns / persists' },
       ],
     },
     highlights: [
-      'Traditional App: User → Always-Running Backend Instance',
-      'Azure Functions: Event → Function Execution → Response / Action',
-      'Ideal for lightweight API calculations, asynchronous background workers, and webhook handlers',
+      'Runs only when triggered — zero idle cost',
+      'Triggers: HTTP request, queue message, file upload, scheduled timer',
+      'Azure auto-scales from 0 to thousands of executions',
+      'Example: a calculation API endpoint — no full backend needed',
     ],
     speakerNotes: [
-      'Here is the architectural comparison.',
-      'Instead of maintaining a continuous web server process for a small API calculation—like calculating a discount or generating an invoice PDF—Azure Functions receives the HTTP request, executes the calculation function within milliseconds, returns the response, and releases the compute resources.',
+      'Kanina sa VM, kailangan nating patakbuhin yung buong server 24/7.',
+      'Sa App Service, we deploy our application and Azure manages the infrastructure.',
+      'Dito naman, we deploy a specific piece of code and let Azure execute it whenever it is needed.',
+      'For example: an API endpoint that calculates something. Instead of running an entire backend just for that one operation, we create an Azure Function that handles that specific request.',
+      'Because it is event-driven, Azure can automatically scale the function depending on workload.',
     ],
   },
 
-  // PART 2: STATIC WEB APPS + APP SERVICE
+  // ── 4. STATIC WEB APPS + APP SERVICE ─────────────────────────────────────
+
   {
-    id: 'swa-app-service-concept',
-    title: 'Decoupling Frontend & Backend',
+    id: 'swa-appservice-statement',
+    title: 'Static Web Apps + App Service',
     section: 'Static Web Apps + App Service',
-    type: 'text-visual',
-    motifBadge: 'Architecture: Decoupled',
-    contentBlocks: [
-      {
-        heading: 'Why Separate the UI from the API?',
-        body: [
-          'Modern web applications decouple single-page applications (React, Vue, Angular, Svelte) from backend APIs (.NET, Node.js, Python, Java).',
-          'Static assets are served globally via edge CDNs, while compute-heavy business logic runs in specialized application hosting environments.',
-        ],
-        highlight: 'Independent CI/CD pipelines, independent scaling, and zero compute load on the backend for static files.',
-      },
-    ],
-    visualCards: [
-      {
-        title: 'FRONTEND: STATIC WEB APPS',
-        tag: 'GLOBAL EDGE',
-        items: [
-          'React / Next.js / Vue / Angular',
-          'Global CDN distribution',
-          'Free SSL & custom domains',
-          'GitHub Actions CI/CD integrated',
-          'Staging preview environments',
-        ],
-      },
-      {
-        title: 'BACKEND: APP SERVICE',
-        tag: 'DEDICATED API',
-        items: [
-          'Node.js / Express / NestJS',
-          '.NET Core Web API',
-          'Python FastAPI / Django',
-          'Java Spring Boot',
-          'VNet integration & enterprise auth',
-        ],
-      },
+    type: 'statement',
+    statement: 'Separate the frontend and the backend.',
+    subtitle: 'Host your UI on Static Web Apps. Host your API on App Service. Deploy them independently.',
+    motifBadge: 'Hybrid // Decoupled Architecture',
+    logos: [
+      { src: '/assets/icons/azure-static-web-apps.svg', alt: 'Azure Static Web Apps' },
+      { src: '/assets/icons/azure-app-service.svg', alt: 'Azure App Service' },
     ],
     speakerNotes: [
-      'Next, let us look at the modern architecture of separating frontend and backend hosting.',
-      'Instead of bundling our React or Angular single-page application inside our Spring Boot or Express server, we host our frontend on Azure Static Web Apps and our backend on Azure App Service.',
-      'This allows both the frontend and backend teams to deploy independently without risking downtime on the other tier.',
+      'Now, we can combine Azure Static Web Apps and Azure App Service to build a full-stack application.',
+      'The idea is simple: instead of hosting our frontend and backend together in one service, we separate them.',
+      'Kung kanina sa App Service, sinabi natin na pwede nating ilagay doon yung buong application, ngayon hinihiwalay natin yung frontend at backend.',
     ],
   },
+
   {
-    id: 'swa-app-service-architecture',
+    id: 'swa-appservice-architecture',
     title: 'Static Web Apps + App Service Architecture',
     section: 'Static Web Apps + App Service',
     type: 'architecture',
     motifBadge: 'Architecture: SWA + App Service',
     summary:
-      'User requests static frontend assets from global edge nodes (SWA), and the browser communicates directly with the App Service backend API for dynamic data.',
+      'User opens the site — Static Web Apps serves the frontend. When the frontend needs data, it calls the REST API hosted on App Service.',
     diagram: {
       nodes: [
-        { id: 'user', label: 'End User', sublabel: 'Browser Client', type: 'user' },
-        { id: 'swa', label: 'Static Web Apps', sublabel: 'React / Angular CDN', type: 'network' },
-        { id: 'appservice', label: 'App Service', sublabel: '.NET / Node / Python API', type: 'compute' },
-        { id: 'db', label: 'Azure SQL / Cosmos', sublabel: 'Managed Database', type: 'storage' },
+        { id: 'user', label: 'End User', sublabel: 'Browser', type: 'user' },
+        { id: 'swa', label: 'Static Web Apps', sublabel: 'React / Vue / Angular', type: 'network' },
+        { id: 'appservice', label: 'App Service', sublabel: 'Node / Java / Python API', type: 'compute' },
+        { id: 'db', label: 'Database', sublabel: 'Azure SQL / Cosmos', type: 'storage' },
       ],
       edges: [
-        { from: 'user', to: 'swa', label: '1. Load HTML/JS/CSS' },
-        { from: 'user', to: 'appservice', label: '2. REST / GraphQL API Calls' },
-        { from: 'appservice', to: 'db', label: '3. Query / Persist' },
+        { from: 'user', to: 'swa', label: '1. Load frontend' },
+        { from: 'user', to: 'appservice', label: '2. API calls for data' },
+        { from: 'appservice', to: 'db', label: '3. Query / persist' },
       ],
     },
     highlights: [
       'Frontend and backend deploy via independent CI/CD pipelines',
-      'Static assets served with sub-millisecond edge latency',
-      'App Service backend dedicated purely to business logic and data processing',
+      'Static Web Apps: global CDN, free SSL, GitHub Actions built in',
+      'App Service: continuously running REST API (Node, Java, Python, .NET)',
+      'Frontend calls the App Service API when it needs data',
     ],
     speakerNotes: [
-      'Let us trace the request path in this architecture.',
-      'The user browser first loads static HTML, JavaScript, and CSS from Azure Static Web Apps, served from edge nodes worldwide.',
-      'Once the single-page application is running in the client browser, it makes REST or GraphQL API calls directly to the Azure App Service backend, which handles authentication, business logic, and database operations.',
+      'Kung may user na nag-open ng website natin, Static Web Apps ang magsi-serve ng frontend.',
+      'Then kapag kailangan ng data, tatawag yung frontend sa API na naka-host sa App Service.',
+      'This allows frontend and backend teams to deploy independently on different schedules.',
     ],
   },
 
-  // PART 3: STATIC WEB APPS + AZURE FUNCTIONS
+  // ── 5. STATIC WEB APPS + AZURE FUNCTIONS ─────────────────────────────────
+
   {
     id: 'swa-functions-statement',
-    title: 'Same Frontend. Different Backend Model.',
+    title: 'Static Web Apps + Azure Functions',
     section: 'Static Web Apps + Azure Functions',
     type: 'statement',
-    statement: 'Same frontend. Different backend model.',
-    subtitle: 'Swapping a continuously running App Service backend for on-demand serverless functions.',
-    motifBadge: 'SWA + Serverless',
+    statement: 'Same frontend. Serverless backend.',
+    subtitle: 'Swap the always-running App Service API for on-demand Azure Functions.',
+    motifBadge: 'Serverless // Modern Mix',
+    logos: [
+      { src: '/assets/icons/azure-static-web-apps.svg', alt: 'Azure Static Web Apps' },
+      { src: '/assets/icons/azure-functions.svg', alt: 'Azure Functions' },
+    ],
     speakerNotes: [
-      'Same frontend. Different backend model.',
-      'We keep the exact same Static Web Apps frontend, but now we replace the continuously running App Service backend with Azure Functions.',
+      'Now, we take the same idea of separating frontend and backend, but instead of using Azure App Service for the backend, we use Azure Functions.',
+      'Azure Static Web Apps handles global content delivery for modern frontend frameworks.',
+      'Meanwhile, serverless backend logic runs via managed Azure Functions — only when needed.',
     ],
   },
-  {
-    id: 'swa-functions-comparison',
-    title: 'App Service vs Azure Functions Backend',
-    section: 'Static Web Apps + Azure Functions',
-    type: 'comparison',
-    motifBadge: 'Backend Comparison',
-    left: {
-      title: 'SWA + App Service',
-      subtitle: 'Continuously Running API',
-      points: [
-        'Backend server runs 24/7 on dedicated App Service Plan',
-        'Predictable monthly billing based on VM tier',
-        'Best for long-running processes, WebSockets, & steady traffic',
-        'Requires capacity planning and autoscaling rules',
-      ],
-      tag: 'CONVENTIONAL PAAS',
-    },
-    right: {
-      title: 'SWA + Azure Functions',
-      subtitle: 'Event-Driven Serverless API',
-      points: [
-        'Backend code runs purely on-demand per API request',
-        'Scales automatically from 0 to thousands of executions',
-        'Zero cost when no requests are being processed',
-        'Directly integrated managed backend option in Static Web Apps',
-      ],
-      tag: 'SERVERLESS PAAS',
-      isPrimary: true,
-    },
-    takeaway:
-      'Choose App Service when you need continuous runtime or persistent connections; choose Azure Functions when your API workload is bursty, lightweight, or event-driven.',
-    speakerNotes: [
-      'Here is the fundamental difference: With App Service, you have a conventional continuously running web and API application server. With Azure Functions, you have an event-driven serverless backend that executes only when an API call arrives.',
-      'Static Web Apps even has built-in support to link Azure Functions directly as integrated backend APIs with unified authentication and routing.',
-    ],
-  },
+
   {
     id: 'swa-functions-architecture',
     title: 'Static Web Apps + Azure Functions Architecture',
@@ -252,29 +136,67 @@ export const functionsSwaSlides: SlideData[] = [
     type: 'architecture',
     motifBadge: 'Architecture: SWA + Functions',
     summary:
-      'Full serverless web architecture combining global edge static delivery with on-demand function execution and managed serverless database persistence.',
+      'Frontend loads from Static Web Apps. When the frontend needs data, it calls an Azure Function — which validates the request, runs business logic, queries the database, and returns the response.',
     diagram: {
       nodes: [
-        { id: 'user', label: 'End User', sublabel: 'Browser Client', type: 'user' },
+        { id: 'user', label: 'End User', sublabel: 'Browser', type: 'user' },
         { id: 'swa', label: 'Static Web Apps', sublabel: 'React / Vue / Angular', type: 'network' },
-        { id: 'fn', label: 'Azure Functions', sublabel: 'Serverless API Endpoints', type: 'compute' },
-        { id: 'db', label: 'Cosmos DB / Azure SQL', sublabel: 'Managed Data Store', type: 'storage' },
+        { id: 'fn', label: 'Azure Functions', sublabel: 'Serverless API', type: 'compute' },
+        { id: 'db', label: 'Database', sublabel: 'Cosmos DB / Azure SQL', type: 'storage' },
       ],
       edges: [
-        { from: 'user', to: 'swa', label: '1. Fetch UI Assets' },
-        { from: 'user', to: 'fn', label: '2. Invoke Serverless API' },
-        { from: 'fn', to: 'db', label: '3. Read / Write Data' },
+        { from: 'user', to: 'swa', label: '1. Load frontend' },
+        { from: 'user', to: 'fn', label: '2. HTTP request to function' },
+        { from: 'fn', to: 'db', label: '3. Query / persist' },
       ],
     },
     highlights: [
-      'Completely serverless architecture from frontend edge to backend compute',
-      'Zero idle compute cost across the entire application stack',
-      'Automatic scaling handles traffic spikes without manual provisioning',
+      'Frontend communicates with functions that only run when needed',
+      'Function: validate → business logic → query DB → return response',
+      'Zero idle backend cost — scales automatically with traffic',
+      'Fully serverless stack from edge CDN to compute',
     ],
     speakerNotes: [
-      'This architecture diagram illustrates the fully serverless stack.',
-      'The user browser fetches UI bundles from Static Web Apps, and every API action triggers an Azure Function that queries the database and immediately terminates after responding.',
-      'This delivers exceptional cost efficiency and effortless scalability for applications with variable or spiky traffic patterns.',
+      'Kung kanina, our frontend was communicating with an API hosted on App Service.',
+      'Dito naman, our frontend communicates with functions that only run when they are needed.',
+      'Our frontend sends an HTTP request to an Azure Function. That function validates the request, performs business logic, queries a database, and returns the response back to the frontend.',
+    ],
+  },
+
+  {
+    id: 'swa-backend-comparison',
+    title: 'App Service vs Azure Functions as Backend',
+    section: 'Static Web Apps + Azure Functions',
+    type: 'comparison',
+    motifBadge: 'Backend Model Comparison',
+    left: {
+      title: 'SWA + App Service',
+      subtitle: 'Continuously Running API',
+      tag: 'ALWAYS ON',
+      points: [
+        'Backend server runs 24/7',
+        'Predictable billing based on plan tier',
+        'Best for steady traffic & long-running processes',
+        'Traditional REST API model',
+      ],
+    },
+    right: {
+      title: 'SWA + Azure Functions',
+      subtitle: 'On-Demand Serverless API',
+      tag: 'EVENT-DRIVEN',
+      isPrimary: true,
+      points: [
+        'Backend runs only when triggered by a request',
+        'Scales from 0 to thousands automatically',
+        'Zero cost when idle',
+        'Best for bursty, lightweight, or variable traffic',
+      ],
+    },
+    takeaway:
+      'Choose App Service when your API runs continuously; choose Functions when your backend is event-driven or traffic is unpredictable.',
+    speakerNotes: [
+      'The fundamental difference: App Service is always running. Functions execute only on demand.',
+      'Static Web Apps even has built-in support to link Azure Functions directly as integrated backend APIs.',
     ],
   },
 ];

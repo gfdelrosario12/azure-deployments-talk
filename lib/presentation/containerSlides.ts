@@ -1,93 +1,32 @@
 import { SlideData } from './types';
 
 export const containerSlides: SlideData[] = [
-  // SECTION HEADER: Containers on Azure
+  // ── 6. AZURE CONTAINER APPS ───────────────────────────────────────────────
+
   {
-    id: 'containers-section-header',
-    title: 'Containers on Azure',
-    section: 'Containers on Azure',
-    type: 'section-header',
-    sectionNumber: '05',
-    description: 'Azure Container Apps, App Service for Containers, ACR, and managed container deployment.',
-    motifBadge: 'Docker & Container Platforms',
+    id: 'container-apps-statement',
+    title: 'Azure Container Apps',
+    section: 'Azure Container Apps',
+    type: 'statement',
+    statement: 'Heavily invested in Docker, but Kubernetes feels like a rocket launcher to a knife fight?',
+    subtitle: 'The modern container sweet spot — managed microservices without cluster complexity.',
+    motifBadge: 'Containers // Middle Ground',
+    logos: [{ src: '/assets/icons/azure-container-apps.svg', alt: 'Azure Container Apps' }],
     speakerNotes: [
-      'Now let us enter the container landscape in Azure.',
-      'We will look at how Azure handles Docker containers without requiring you to jump straight into complex cluster infrastructure.',
+      'Now, what if you are heavily invested in Docker, but Kubernetes feels like bringing a rocket launcher to a knife fight? Enter Azure Container Apps.',
+      'This is one of the more modern approaches in Azure.',
+      "It's a middle ground between App Service and AKS.",
     ],
   },
 
-  // PART 1: AZURE CONTAINER APPS
-  {
-    id: 'container-apps-statement',
-    title: 'Enter Azure Container Apps',
-    section: 'Azure Container Apps',
-    type: 'statement',
-    statement: 'What if you are heavily invested in Docker, but Kubernetes feels like bringing a rocket launcher to a knife fight? Enter Azure Container Apps.',
-    subtitle: 'Managed serverless container platform powered by Kubernetes, without cluster management overhead.',
-    motifBadge: 'Microservices & Serverless Containers',
-    speakerNotes: [
-      'What if you are heavily invested in Docker, but Kubernetes feels like bringing a rocket launcher to a knife fight? Enter Azure Container Apps.',
-      'Many teams have microservices packaged into Docker containers, but managing nodes, ingress controllers, Helm charts, and control planes in Kubernetes is overkill for their operational team size.',
-    ],
-  },
-  {
-    id: 'container-apps-concept',
-    title: 'Managed Serverless Containers',
-    section: 'Azure Container Apps',
-    type: 'text-visual',
-    motifBadge: 'Platform Capabilities',
-    contentBlocks: [
-      {
-        heading: 'The Sweet Spot of Container Platforms',
-        body: [
-          'Azure Container Apps (ACA) provides an abstraction over Kubernetes (built on K8s, KEDA, and Envoy) that eliminates cluster administration.',
-          'You deploy standard OCI / Docker images, and Azure automatically manages ingress, TLS certificates, service discovery, autoscaling (including scale-to-zero), and revision management.',
-        ],
-        highlight: 'Kubernetes power underneath, PaaS simplicity on top.',
-      },
-      {
-        heading: 'Multi-Container Microservice Environment',
-        body: [
-          'Run coordinated microservices inside a shared Container Apps Environment with built-in private Dapr integration and zero-downtime blue/green traffic splitting.',
-        ],
-      },
-    ],
-    visualCards: [
-      {
-        title: 'PLATFORM CONCERNS MANAGED',
-        tag: 'BUILT-IN',
-        items: [
-          'Managed HTTP Ingress & TLS',
-          'Automatic Scaling (KEDA / Scale-to-0)',
-          'Revision Tracking & Traffic Splitting',
-          'Internal Service Discovery',
-          'Integrated Log Streaming & Metrics',
-        ],
-      },
-      {
-        title: 'MULTI-TIER CONTAINER ARCHITECTURE',
-        tag: 'EXAMPLE COMPOSITION',
-        items: [
-          'Nginx + React Frontend Container',
-          'Spring Boot REST API Container',
-          'Python Background Worker Container',
-          'Direct ACR Image Pull Integration',
-        ],
-      },
-    ],
-    speakerNotes: [
-      'Azure Container Apps manages all the complex platform concerns: ingress routing, TLS certificates, application lifecycle, autoscaling based on HTTP load or queue depth with KEDA, and blue-green traffic splitting.',
-      'You get the microservice agility of containers without ever managing a Kubernetes cluster.',
-    ],
-  },
   {
     id: 'container-apps-architecture',
-    title: 'Container Apps Architecture Flow',
+    title: 'Azure Container Apps Architecture',
     section: 'Azure Container Apps',
     type: 'architecture',
-    motifBadge: 'Architecture: ACA Environment',
+    motifBadge: 'Architecture: Container Apps',
     summary:
-      'Users access the managed Ingress endpoint, which routes requests to frontend, API, and asynchronous background worker containers running inside a secure ACA Environment.',
+      'Containerize your components — Nginx + React frontend, Spring Boot backend, Python background worker. Container Apps manages ingress, scaling, traffic splitting, and lifecycles without a Kubernetes cluster.',
     diagram: {
       nodes: [
         { id: 'users', label: 'End Users', sublabel: 'HTTPS Traffic', type: 'user' },
@@ -97,152 +36,81 @@ export const containerSlides: SlideData[] = [
         { id: 'worker', label: 'Worker Container', sublabel: 'Python Background', type: 'compute' },
       ],
       edges: [
-        { from: 'users', to: 'aca', label: 'HTTPS Request' },
+        { from: 'users', to: 'aca', label: 'HTTPS request' },
         { from: 'aca', to: 'fe', label: 'routes UI traffic' },
         { from: 'aca', to: 'api', label: 'routes API calls' },
         { from: 'api', to: 'worker', label: 'dispatches tasks' },
       ],
     },
     highlights: [
-      'Independent autoscaling per container (including scale-to-zero for workers)',
-      'Built-in ingress handles SSL termination and routing',
-      'Unified environment sharing private networking and service discovery',
+      'Middle ground between App Service and AKS',
+      'Manages ingress, auto-scaling, traffic splitting, and lifecycles',
+      'No Kubernetes cluster to configure or maintain',
+      'Each container scales independently — including scale-to-zero',
     ],
     speakerNotes: [
-      'Here is our visual architecture: Users access the Container Apps environment through managed ingress.',
-      'Inside the environment, we have our Nginx + React frontend container, our Spring Boot API container, and our Python background worker container.',
-      'Each container scales independently based on workload demand.',
+      'You containerize your components: an Nginx + React frontend container, a Spring Boot backend container, and a Python background worker container.',
+      'Container Apps manages the heavy lifting: ingress traffic, automatic scaling, traffic splitting, and application lifecycles.',
+      'Without requiring you to manually configure or manage a complex Kubernetes cluster.',
     ],
   },
 
-  // PART 2: APP SERVICE FOR CONTAINERS & ACR
+  // ── 7. AZURE APP SERVICE FOR CONTAINERS ──────────────────────────────────
+
   {
-    id: 'dockerfile-concept',
-    title: 'The Dockerfile: Packaging the Runtime',
+    id: 'app-service-containers-statement',
+    title: 'Azure App Service for Containers',
     section: 'App Service for Containers',
-    type: 'text-visual',
-    motifBadge: 'Dockerfile & Artifacts',
-    contentBlocks: [
-      {
-        heading: 'What Does a Dockerfile Define?',
-        body: [
-          'A Dockerfile encapsulates the exact base OS image, runtime version, system dependencies, compiled application code, and startup execution environment.',
-          'It guarantees deterministic behavior: if it runs on your development laptop, it runs identically on Azure.',
-        ],
-        highlight: 'Eliminates "it works on my machine" issues by packaging code + runtime together.',
-      },
-    ],
-    visualCards: [
-      {
-        title: 'DOCKERFILE COMPONENTS',
-        tag: 'IMAGE LAYERS',
-        items: [
-          'Base Image (e.g., node:20-alpine, openjdk:21)',
-          'System Libraries & Native Binaries',
-          'Application Source / Compiled Artifacts',
-          'Environment Variables & Port Exposure',
-          'Entrypoint / CMD Execution Command',
-        ],
-      },
-      {
-        title: 'AZURE CONTAINER REGISTRY (ACR)',
-        tag: 'PRIVATE REPOSITORY',
-        items: [
-          'Secure private OCI artifact storage',
-          'Geo-replication across Azure regions',
-          'Managed Identity (passwordless) authentication',
-          'Integrated vulnerability scanning',
-        ],
-      },
+    type: 'statement',
+    statement: "I want to use Docker, but I don't want to deal with Kubernetes.",
+    subtitle: 'Define your runtime in a Dockerfile. Let Azure handle the rest.',
+    motifBadge: 'Docker // Without Kubernetes',
+    logos: [
+      { src: '/assets/icons/azure-container-registry.svg', alt: 'Azure Container Registry' },
+      { src: '/assets/icons/azure-app-service.svg', alt: 'Azure App Service' },
     ],
     speakerNotes: [
-      'To deploy custom containers, we start with the Dockerfile.',
-      'The Dockerfile defines the base runtime, dependencies, application packaging, and startup commands.',
-      'We then build that image and push it to Azure Container Registry (ACR), our private, secure container repository in Azure.',
+      'Now, kanina namention ko ang Docker.',
+      'Bare basics ng Docker: gagawa ka ng Dockerfile. Diyan pwede mo i-define kung anong runtime, dependencies, and configurations ang kailangan ng application.',
+      'Para hindi na kailangan gawin ng ibang developers na pagpapasahan mo nito.',
+      'Which is also helpful for deployment — App Service for Containers does not need to figure out how to set up the application environment.',
     ],
   },
+
   {
-    id: 'container-pipeline-diagram',
-    title: 'Docker Deployment Pipeline',
+    id: 'app-service-containers-pipeline',
+    title: 'App Service for Containers: CI/CD Pipeline',
     section: 'App Service for Containers',
     type: 'architecture',
-    motifBadge: 'CI/CD Pipeline',
+    motifBadge: 'Pipeline: GitHub → ACR → App Service',
     summary:
-      'Continuous deployment pipeline from source code push in GitHub to automated build, storage in Azure Container Registry (ACR), and zero-downtime deployment to App Service for Containers.',
+      'Code is pushed to GitHub, built via GitHub Actions into a Docker image, stored in Azure Container Registry (ACR), then deployed directly to App Service for Containers.',
     diagram: {
       nodes: [
         { id: 'github', label: 'GitHub', sublabel: 'Source Code', type: 'source' },
         { id: 'actions', label: 'GitHub Actions', sublabel: 'CI/CD Runner', type: 'compute' },
-        { id: 'docker', label: 'Docker Build', sublabel: 'Image Creation', type: 'badge' },
-        { id: 'acr', label: 'Azure Container Registry', sublabel: 'Private Image Hub', type: 'storage' },
-        { id: 'appservice', label: 'App Service Containers', sublabel: 'Managed Web Host', type: 'compute' },
+        { id: 'acr', label: 'Azure Container Registry', sublabel: 'Private Image Store (ACR)', type: 'storage' },
+        { id: 'appservice', label: 'App Service', sublabel: 'for Containers', type: 'compute' },
         { id: 'users', label: 'End Users', sublabel: 'Live Traffic', type: 'user' },
       ],
       edges: [
         { from: 'github', to: 'actions', label: '1. git push' },
-        { from: 'actions', to: 'docker', label: '2. docker build' },
-        { from: 'docker', to: 'acr', label: '3. docker push' },
-        { from: 'acr', to: 'appservice', label: '4. pull image & deploy' },
-        { from: 'appservice', to: 'users', label: '5. serve traffic' },
+        { from: 'actions', to: 'acr', label: '2. docker build & push' },
+        { from: 'acr', to: 'appservice', label: '3. pull image & deploy' },
+        { from: 'appservice', to: 'users', label: '4. serve traffic' },
       ],
     },
     highlights: [
-      'Automated container build on every commit',
-      'Images secured in private Azure Container Registry with Managed Identities',
-      'App Service automatically restarts container on new image release with zero downtime',
+      'Dockerfile defines runtime, dependencies, and startup — no ambiguity',
+      'ACR: private, secure Docker image storage in Azure',
+      'GitHub Actions builds and pushes the image on every commit',
+      'App Service pulls the latest image and restarts automatically',
     ],
     speakerNotes: [
-      'Here is the complete deployment pipeline.',
-      'When code is pushed to GitHub, GitHub Actions runs `docker build`, pushes the image tag to Azure Container Registry (ACR), and Azure App Service for Containers pulls the latest image and restarts the container smoothly.',
-    ],
-  },
-  {
-    id: 'app-service-containers-statement',
-    title: 'The Practical Value of App Service for Containers',
-    section: 'App Service for Containers',
-    type: 'statement',
-    statement: "I want to use Docker, but I don't want to deal with Kubernetes.",
-    subtitle: 'Standard web application PaaS benefits paired with custom container runtime flexibility.',
-    motifBadge: 'Practical Cloud Strategy',
-    speakerNotes: [
-      "I want to use Docker, but I don't want to deal with Kubernetes.",
-      'This is one of the most practical sweet spots in cloud development: you get the packaging freedom of Docker without taking on Kubernetes operational complexity.',
-    ],
-  },
-  {
-    id: 'code-vs-container-appservice-comparison',
-    title: 'Managed Runtime vs Custom Container App Service',
-    section: 'App Service for Containers',
-    type: 'comparison',
-    motifBadge: 'App Service Deployment Choices',
-    left: {
-      title: 'App Service (Code / Managed)',
-      subtitle: 'Azure-Managed Runtimes',
-      points: [
-        'Azure maintains Node.js, .NET, Python, Java versions',
-        'Direct deployment from git, ZIP, or GitHub Actions',
-        'Automatic security patching of underlying runtime stack',
-        'Restricted to officially supported versions and libraries',
-      ],
-      tag: 'STANDARD PAAS',
-    },
-    right: {
-      title: 'App Service for Containers',
-      subtitle: 'Custom Docker Image',
-      points: [
-        'Bring any runtime, OS packages, fonts, or native C/C++ libraries',
-        'Team manages Dockerfile and image patching',
-        'Identical environment between local docker-compose and cloud',
-        'Same PaaS benefits: custom domains, autoscaling, deployment slots',
-      ],
-      tag: 'CONTAINER PAAS',
-      isPrimary: true,
-    },
-    takeaway:
-      'Use Managed App Service for rapid development with standard stacks; use App Service for Containers when your application requires custom dependencies or pre-built Docker images.',
-    speakerNotes: [
-      'Let us compare standard App Service with App Service for Containers.',
-      'In standard App Service, Azure manages the runtime versions and patches. In App Service for Containers, you bring your own custom Dockerfile—enabling custom OS packages, specific runtime versions, or proprietary libraries—while still retaining all PaaS features like deployment slots and autoscaling.',
+      'Your pipeline looks like this:',
+      'Meron tayong tinatawag na Azure Container Registry, or ACR. This is where we store our Docker images.',
+      'Code is pushed to GitHub, built via GitHub Actions into a Docker image, stored in ACR, and then deployed directly to App Service.',
+      "You get to say: I want to use Docker, but I don't want to deal with Kubernetes.",
     ],
   },
 ];

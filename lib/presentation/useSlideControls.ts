@@ -11,6 +11,7 @@ export function useSlideControls({ totalSlides, initialSlide = 0 }: SlideControl
   const [currentSlide, setCurrentSlide] = useState(initialSlide);
   const [showNotes, setShowNotes] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showNav, setShowNav] = useState(true);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => Math.min(prev + 1, totalSlides - 1));
@@ -26,6 +27,10 @@ export function useSlideControls({ totalSlides, initialSlide = 0 }: SlideControl
 
   const toggleNotes = useCallback(() => {
     setShowNotes((prev) => !prev);
+  }, []);
+
+  const toggleNav = useCallback(() => {
+    setShowNav((prev) => !prev);
   }, []);
 
   const toggleFullscreen = useCallback(() => {
@@ -60,12 +65,15 @@ export function useSlideControls({ totalSlides, initialSlide = 0 }: SlideControl
       } else if (e.key.toLowerCase() === 'f') {
         e.preventDefault();
         toggleFullscreen();
+      } else if (e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        toggleNav();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nextSlide, prevSlide, goToSlide, toggleNotes, toggleFullscreen, totalSlides]);
+  }, [nextSlide, prevSlide, goToSlide, toggleNotes, toggleFullscreen, toggleNav, totalSlides]);
 
   return {
     currentSlide,
@@ -77,6 +85,8 @@ export function useSlideControls({ totalSlides, initialSlide = 0 }: SlideControl
     toggleNotes,
     isFullscreen,
     toggleFullscreen,
+    showNav,
+    toggleNav,
     progressPercent: totalSlides > 1 ? (currentSlide / (totalSlides - 1)) * 100 : 100,
   };
 }

@@ -7,9 +7,6 @@ export function CaseStudySlide({ slide }: { slide: CaseStudySlideData }) {
   return (
     <div className="flex flex-col justify-center min-h-[70vh] px-6 sm:px-12 max-w-5xl mx-auto animate-fadeIn">
       <div className="mb-6 border-b border-zinc-800 pb-4">
-        <span className="font-mono text-xs text-indigo-400 tracking-wider uppercase block mb-1">
-          {slide.section} {'// CASE STUDY'}
-        </span>
         <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">
           {slide.scenarioTitle}
         </h2>
@@ -38,6 +35,9 @@ export function CaseStudySlide({ slide }: { slide: CaseStudySlideData }) {
           <p className="text-emerald-200 font-mono text-sm">{slide.outcome}</p>
         </div>
       </div>
+
+      {/* Bottom accent line */}
+      <div className="mt-6 w-24 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
     </div>
   );
 }

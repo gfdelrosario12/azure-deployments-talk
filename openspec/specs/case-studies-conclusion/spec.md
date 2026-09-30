@@ -46,7 +46,7 @@ The slide deck SHALL present the core engineering conclusion emphasizing "Keep I
 - **THEN** the deck displays the KISS philosophy slide, the 5-point decision criteria breakdown, and the progressive scaling mindset.
 
 ### Requirement: Outro and Final Narrative Resolution
-The slide deck SHALL conclude with the final punchline "Get your application off localhost:8080, for god’s sake.", followed by the outro slide ("Thank you so much, everyone!", presenter social links, and handoff "Bringing it back to the host.") visually mirroring the opening localhost slide as a completed journey to production.
+The slide deck SHALL conclude with the KISS conclusion principles and the final punchline "Get your application off localhost:8080, for god’s sake.", followed by the outro slide ("Thank you so much, everyone!" and presenter social links with QR codes) visually mirroring the opening localhost slide as a completed journey to production.
 
 #### Scenario: Reaching Presentation Outro
 - **WHEN** the viewer reaches the final presentation slides

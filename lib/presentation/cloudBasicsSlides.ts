@@ -2,27 +2,6 @@ import { SlideData } from './types';
 
 export const cloudBasicsSlides: SlideData[] = [
   {
-    id: 'cloud-checkin-hands',
-    title: 'Audience Check-In',
-    section: 'Cloud Basics',
-    type: 'question-reveal',
-    question: 'Quick Show of Hands:',
-    motifBadge: 'cloud-poll',
-    options: [
-      { id: '1', label: '1. Who has heard of cloud computing?', count: 'Hand up!' },
-      { id: '2', label: '2. Who has deployed an app to the cloud?', count: 'Hand up!' },
-      { id: '3', label: '3. Who has used Microsoft Azure?', count: 'Hand up!' },
-    ],
-    revealedAnswer: 'Every developer is somewhere on the cloud journey.',
-    explanation:
-      'Whether you are just beginning or already running multi-region clusters, understanding the spectrum of cloud abstractions will help you make intentional architectural decisions.',
-    speakerNotes: [
-      'Before we jump into architecture, let’s do a quick pulse check.',
-      'Show of hands: Who has heard of the cloud? Keep your hands up if you have actually used cloud services to deploy code.',
-      'And finally, who here has specifically worked with Microsoft Azure?',
-    ],
-  },
-  {
     id: 'iaas-paas-saas-spectrum',
     title: 'The Cloud Service Spectrum',
     section: 'Cloud Basics',
@@ -67,6 +46,22 @@ export const cloudBasicsSlides: SlideData[] = [
       'With IaaS, Azure gives you a blank VM and you manage the OS, security patches, networking, and dependencies.',
       'With PaaS, Azure manages the operating system and runtime layer, allowing you to focus on application logic.',
       'And with SaaS, the complete software application is delivered ready-to-use.',
+    ],
+  },
+  {
+    id: 'serverless-meme',
+    title: 'The Serverless Reality',
+    section: 'Serverless',
+    type: 'image',
+    motifBadge: 'serverless != no servers',
+    image: {
+      src: '/assets/memes/serverlessmeme1.jpg',
+      alt: 'Serverless meme',
+    },
+    speakerNotes: [
+      'Now, that brings us to a buzzword that everyone in tech loves to throw around: Serverless.',
+      'Let’s be crystal clear: servers still exist! The cloud provider is simply abstracting the server lifecycle entirely away from your daily developer workflow.',
+      'You write code that reacts to events, and the platform handles scaling from zero to thousands of executions automatically.',
     ],
   },
   {

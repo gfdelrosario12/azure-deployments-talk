@@ -6,7 +6,9 @@ export type SlideType =
   | 'comparison'
   | 'question-reveal'
   | 'case-study'
-  | 'closing-takeaway';
+  | 'closing-takeaway'
+  | 'socials'
+  | 'image';
 
 export interface DiagramNode {
   id: string;
@@ -42,6 +44,12 @@ export interface StatementSlideData extends BaseSlide {
   statement: string;
   subtitle?: string;
   accentColor?: string;
+  logos?: { src: string; alt: string; className?: string }[];
+  presentationLink?: {
+    label: string;
+    url: string;
+    qrSrc: string;
+  };
 }
 
 export interface SectionHeaderSlideData extends BaseSlide {
@@ -52,6 +60,16 @@ export interface SectionHeaderSlideData extends BaseSlide {
 
 export interface TextVisualSlideData extends BaseSlide {
   type: 'text-visual';
+  image?: {
+    src: string;
+    alt: string;
+    caption?: string;
+  };
+  affiliations?: {
+    src: string;
+    alt: string;
+    label?: string;
+  }[];
   contentBlocks: {
     heading?: string;
     body: string[];
@@ -119,6 +137,42 @@ export interface ClosingTakeawaySlideData extends BaseSlide {
   callToAction?: string;
 }
 
+export interface ImageSlideData extends BaseSlide {
+  type: 'image';
+  image: {
+    src: string;
+    alt: string;
+    caption?: string;
+  };
+}
+
+export interface SocialLink {
+  id: string;
+  label: string;
+  handle: string;
+  url: string;
+  qrSrc: string;
+  icon: 'link' | 'linkedin' | 'facebook' | 'globe';
+}
+
+export interface SocialsSlideData extends BaseSlide {
+  type: 'socials';
+  headline: string;
+  subline?: string;
+  speaker?: {
+    src: string;
+    alt: string;
+    name: string;
+    titles: string[];
+  };
+  socials: SocialLink[];
+  presentation: {
+    label: string;
+    url: string;
+    qrSrc: string;
+  };
+}
+
 export type SlideData =
   | StatementSlideData
   | SectionHeaderSlideData
@@ -127,4 +181,6 @@ export type SlideData =
   | ComparisonSlideData
   | QuestionRevealSlideData
   | CaseStudySlideData
-  | ClosingTakeawaySlideData;
+  | ClosingTakeawaySlideData
+  | ImageSlideData
+  | SocialsSlideData;

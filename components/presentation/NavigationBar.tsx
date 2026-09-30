@@ -12,6 +12,7 @@ interface NavigationBarProps {
   onPrev: () => void;
   onNext: () => void;
   onToggleFullscreen: () => void;
+  onToggleNav: () => void;
   progressPercent: number;
 }
 
@@ -25,10 +26,11 @@ export function NavigationBar({
   onPrev,
   onNext,
   onToggleFullscreen,
+  onToggleNav,
   progressPercent,
 }: NavigationBarProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-zinc-800">
+    <header className="w-full bg-black/90 backdrop-blur-md border-t border-zinc-800">
       {/* Progress Bar */}
       <div className="w-full bg-zinc-900 h-[2px]">
         <div
@@ -108,6 +110,14 @@ export function NavigationBar({
             title="Toggle Fullscreen (F)"
           >
             ⛶
+          </button>
+
+          <button
+            onClick={onToggleNav}
+            className="px-2.5 py-1 rounded border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-cyan-300 hover:border-cyan-500/50 transition-colors"
+            title="Hide Navigation (M)"
+          >
+            HIDE [M]
           </button>
         </div>
       </div>

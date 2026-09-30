@@ -1,79 +1,25 @@
 import { SlideData } from './types';
 
 export const vmAppServiceSlides: SlideData[] = [
-  // SLIDE 1: Azure VM Section Statement
+  // ── 1. AZURE VIRTUAL MACHINE ──────────────────────────────────────────────
+
   {
     id: 'vm-statement',
-    title: 'Azure Virtual Machines',
+    title: 'Azure Virtual Machine',
     section: 'Azure Virtual Machine (IaaS)',
     type: 'statement',
-    statement: 'You get the server. You own the problem.',
-    subtitle: 'The foundational, maximum-control IaaS approach in Microsoft Azure.',
-    motifBadge: 'IaaS // Raw Server',
+    statement: 'You get the server. You own everything inside it.',
+    subtitle: 'Pure IaaS — renting a raw server in the cloud.',
+    motifBadge: 'IaaS // The Classic Approach',
+    logos: [{ src: '/assets/icons/azure-vm.svg', alt: 'Azure Virtual Machine' }],
     speakerNotes: [
       'We start with the most traditional approach: the Azure Virtual Machine.',
-      'An Azure VM is Infrastructure as a Service (IaaS). It gives you a raw virtualized server in the cloud—complete root access and total freedom.',
-      'With that ultimate freedom comes the ultimate reality: You get the server, and you own every single problem that happens on it.',
+      'Essentially, you are renting a raw server in the cloud. This is pure IaaS.',
+      'You can install whatever you want on it — Ubuntu, Docker, Nginx, PostgreSQL, Spring Boot, Node.js, you name it.',
+      'Azure gives us the server — but we are responsible for everything running inside that server.',
     ],
   },
 
-  // SLIDE 2: Azure VM Stack & CLI Responsibility
-  {
-    id: 'vm-tech-stack-cli',
-    title: 'Total Freedom, Total Responsibility',
-    section: 'Azure Virtual Machine (IaaS)',
-    type: 'text-visual',
-    motifBadge: 'ssh gladwin@azure-vm',
-    contentBlocks: [
-      {
-        heading: 'The Command Line Workflow',
-        body: [
-          'You SSH into your Linux/Windows box, run `sudo apt update && sudo apt install -y ...`, configure systemd services, and bind ports.',
-          'Everything you could do on a local bare-metal server, you can do here.',
-        ],
-        highlight: 'Complete control over OS kernels, packages, background daemons, and system libraries.',
-      },
-      {
-        heading: 'What Runs on an Azure VM?',
-        body: [
-          'Full flexibility to host web servers, background worker jobs, databases, reverse proxies, and container runtimes.',
-        ],
-      },
-    ],
-    visualCards: [
-      {
-        title: 'COMMON VM STACKS',
-        tag: 'CUSTOM RUNTIMES',
-        items: [
-          'Ubuntu / Debian / RHEL',
-          'Docker Engine',
-          'Nginx / Apache',
-          'PostgreSQL / MySQL',
-          'Spring Boot (Java)',
-          'Node.js / Express',
-          'Python (Django / FastAPI)',
-        ],
-      },
-      {
-        title: 'MANAGEMENT CHECKLIST',
-        tag: 'MANUAL OPS',
-        items: [
-          'OS Security Patches',
-          'Firewall Rules (NSGs)',
-          'SSL / TLS Cert Renewals',
-          'Process Restarts (systemd)',
-          'Log Rotation & Disk Space',
-        ],
-      },
-    ],
-    speakerNotes: [
-      'When you launch an Azure VM, you get an SSH prompt. You can install any packages with sudo apt install, configure systemd units to keep your services alive, set up your reverse proxy with Nginx, and manage your database locally or remotely.',
-      'Whether you are running an Ubuntu server with Spring Boot, Node.js, Python FastAPI, or running Docker directly on the host, you have full control.',
-      'However, that means you are personally on the hook for OS security patches, firewall configurations, certbot renewals, and disk space management.',
-    ],
-  },
-
-  // SLIDE 3: Azure VM Deployment Architecture Diagram
   {
     id: 'vm-architecture-diagram',
     title: 'Azure VM Deployment Flow',
@@ -81,250 +27,256 @@ export const vmAppServiceSlides: SlideData[] = [
     type: 'architecture',
     motifBadge: 'Deployment: git clone',
     summary:
-      'Traditional VM deployment requires cloning source code onto the host, building the binary, configuring system services, and routing external HTTP traffic through a reverse proxy.',
+      'Clone your repository into the VM, run your application as a system service, and route public traffic through Nginx. Optionally, run Docker containers on the same host.',
     diagram: {
       nodes: [
         { id: 'gh', label: 'GitHub', sublabel: 'Source Repo', type: 'source' },
-        { id: 'vm', label: 'Azure VM', sublabel: 'Ubuntu 24.04', type: 'compute' },
-        { id: 'os', label: 'OS & systemd', sublabel: 'Process Mgr', type: 'storage' },
+        { id: 'vm', label: 'Azure VM', sublabel: 'Ubuntu / Linux', type: 'compute' },
+        { id: 'app', label: 'Application', sublabel: 'Port 8080 (24/7)', type: 'compute' },
         { id: 'nginx', label: 'Nginx', sublabel: 'Reverse Proxy', type: 'network' },
-        { id: 'app', label: 'Application', sublabel: 'Port 8080', type: 'compute' },
         { id: 'users', label: 'End Users', sublabel: 'HTTPS (443)', type: 'user' },
       ],
       edges: [
-        { from: 'gh', to: 'vm', label: 'git clone / ssh' },
-        { from: 'vm', to: 'os', label: 'exec' },
-        { from: 'os', to: 'app', label: 'daemonize' },
-        { from: 'nginx', to: 'app', label: 'proxy_pass' },
+        { from: 'gh', to: 'vm', label: 'git clone' },
+        { from: 'vm', to: 'app', label: 'systemd / run' },
+        { from: 'nginx', to: 'app', label: 'proxy_pass :8080' },
         { from: 'users', to: 'nginx', label: 'web traffic' },
       ],
     },
     secondaryDiagram: {
       nodes: [
-        { id: 'gh-c', label: 'GitHub Actions', sublabel: 'CI Pipeline', type: 'source' },
-        { id: 'vm-c', label: 'Azure VM Host', sublabel: 'Docker Engine', type: 'compute' },
-        { id: 'docker-c', label: 'Docker Container', sublabel: 'app:latest', type: 'compute' },
-        { id: 'nginx-c', label: 'Nginx Container', sublabel: 'Port 80/443', type: 'network' },
-        { id: 'users-c', label: 'End Users', sublabel: 'Public Web', type: 'user' },
+        { id: 'gh2', label: 'GitHub', sublabel: 'Source Repo', type: 'source' },
+        { id: 'vm2', label: 'Azure VM', sublabel: 'Docker Engine', type: 'compute' },
+        { id: 'container', label: 'Docker Container', sublabel: 'app:latest', type: 'compute' },
+        { id: 'nginx2', label: 'Nginx', sublabel: 'Port 80 / 443', type: 'network' },
+        { id: 'users2', label: 'End Users', sublabel: 'Public Web', type: 'user' },
       ],
       edges: [
-        { from: 'gh-c', to: 'vm-c', label: 'docker pull' },
-        { from: 'vm-c', to: 'docker-c', label: 'run' },
-        { from: 'nginx-c', to: 'docker-c', label: 'proxy' },
-        { from: 'users-c', to: 'nginx-c', label: 'requests' },
+        { from: 'gh2', to: 'vm2', label: 'git clone / pull' },
+        { from: 'vm2', to: 'container', label: 'docker run' },
+        { from: 'nginx2', to: 'container', label: 'proxy' },
+        { from: 'users2', to: 'nginx2', label: 'requests' },
       ],
     },
     highlights: [
-      'Manual git pull / SSH deployment scripts',
-      'Port 8080 proxied through port 80/443 via Nginx',
-      'Optionally host containerized workloads via Docker on VM',
+      'sudo apt install anything — full OS-level control',
+      'git clone your repo, serve it 24/7 via systemd',
+      'Or run Docker + Nginx on the same VM',
+      'Azure gives the server — you manage everything inside',
     ],
     speakerNotes: [
-      'Here is the classic architecture flow: Your code lives on GitHub. You SSH into the Azure VM, run git clone or git pull, compile your application, and register it as a systemd background service.',
-      'Nginx listens on port 80 and 443, handling SSL termination, and proxies incoming web requests over to your application running on internal port 8080.',
-      'You can also install Docker on the VM to run your app as containers. But notice who manages the VM health, Docker daemon upgrades, and OS patches? You do.',
+      'The process: get your code from GitHub, git clone it into the VM, then serve it 24/7.',
+      'Instead of running it on your usual PC where you can simply turn it off, the VM stays running in the cloud continuously.',
+      'You can also use Docker inside the VM and serve the application through Nginx.',
+      'With Virtual Machines, mas limitless pa yung pwede magawa.',
     ],
   },
 
-  // SLIDE 4: Azure VM Operational Responsibility Checklist
   {
-    id: 'vm-responsibility-checklist',
-    title: 'The Full VM Ownership Reality',
+    id: 'vm-dockerfile',
+    title: 'Dockerfile: Define Your Runtime Once',
     section: 'Azure Virtual Machine (IaaS)',
     type: 'text-visual',
-    motifBadge: 'IaaS Checklist',
+    motifBadge: 'Docker // Containerization',
     contentBlocks: [
       {
-        heading: 'What You Personally Manage on a VM',
+        heading: 'What is a Dockerfile?',
         body: [
-          '1. Operating System installation, patching, and major kernel upgrades.',
-          '2. Network Security Groups (NSGs), open inbound/outbound ports, and subnets.',
-          '3. Web server configuration (Nginx / Apache mime types, buffer sizes, headers).',
-          '4. SSL certificate provisioning, renewal cron jobs, and DNS records.',
-          '5. Health checks, monitoring agents, crash recoveries, and auto-restart policies.',
+          'A plain-text recipe that describes exactly how to build a container image — OS base, runtime, dependencies, and startup command.',
+          'Write it once. Run it identically on your laptop, a VM, or any cloud platform.',
         ],
-        highlight: 'Great when you need non-standard OS extensions, specific kernels, or legacy dependencies.',
+        highlight: 'No more "it works on my machine" — the container IS the machine.',
+      },
+      {
+        heading: 'Java Spring Boot API',
+        body: [
+          'FROM eclipse-temurin:21-jre-alpine',
+          'WORKDIR /app',
+          'COPY target/aquadflow-api.jar app.jar',
+          'EXPOSE 8080',
+          'ENTRYPOINT ["java", "-jar", "app.jar"]',
+        ],
+      },
+      {
+        heading: 'Next.js Dashboard (multi-stage)',
+        body: [
+          'FROM node:20-alpine AS builder',
+          'WORKDIR /app && COPY package*.json ./',
+          'RUN npm ci && COPY . . && RUN npm run build',
+          '',
+          'FROM node:20-alpine',
+          'WORKDIR /app',
+          'COPY --from=builder /app/.next/standalone ./',
+          'EXPOSE 3000 && CMD ["node", "server.js"]',
+        ],
       },
     ],
     visualCards: [
       {
-        title: 'WHO OWNS WHAT?',
-        tag: 'IaaS SPLIT',
+        title: 'WHY IT MATTERS',
+        tag: 'PORTABILITY',
         items: [
-          'Azure: Physical Datacenter',
-          'Azure: Hypervisor & Hardware',
-          'You: OS & Security Updates',
-          'You: Networking & Firewall Rules',
-          'You: Runtime & Dependencies',
-          'You: Application Code & Data',
+          'Reproducible builds',
+          'Consistent environments',
+          'VM, App Service,',
+          'Container Apps, AKS',
+          'No runtime surprises',
         ],
       },
     ],
     speakerNotes: [
-      'Let’s look at the ownership split: Azure guarantees the physical server and the virtualization layer. Everything from the operating system up is your responsibility.',
-      'If an OpenSSL vulnerability is discovered on Monday morning, you have to patch the VM.',
-      'If your application crashes due to an out-of-memory error, you have to configure the swap space and process monitors.',
-      'This is unmatched power for legacy or specialized workloads, but heavy lifting for modern web applications.',
+      'Before we go further, let me quickly show you what a Dockerfile actually looks like.',
+      'A Dockerfile is just a text file that describes your application environment — the base image, the runtime, your code, and the startup command.',
+      'For the Java Spring Boot API: start from a JRE Alpine image, copy the compiled JAR, expose port 8080, and run it.',
+      'For the Next.js dashboard: multi-stage build — first build the app, then copy only the output into a lean runtime image.',
+      'The key insight: once you have a Dockerfile, you can deploy that container to a VM, App Service for Containers, Container Apps, or AKS — same image, everywhere.',
     ],
   },
 
-  // SLIDE 5: Azure App Service Section Statement
+  {
+    id: 'vm-responsibility',
+    title: 'Total Freedom, Total Responsibility',
+    section: 'Azure Virtual Machine (IaaS)',
+    type: 'comparison',
+    motifBadge: 'IaaS Ownership Split',
+    left: {
+      title: 'Azure Manages',
+      subtitle: 'Physical Infrastructure',
+      tag: 'AZURE',
+      points: [
+        'Physical datacenter & hardware',
+        'Hypervisor & virtualization layer',
+        'Network backbone & power',
+      ],
+    },
+    right: {
+      title: 'You Manage',
+      subtitle: 'Everything Else',
+      tag: 'YOUR RESPONSIBILITY',
+      points: [
+        'OS installation, patching & kernel upgrades',
+        'Nginx / Apache configuration & SSL certs',
+        'Runtime dependencies & application code',
+        'Firewall rules, ports & network security',
+        'Process restarts, logs & disk space',
+      ],
+    },
+    takeaway:
+      'Great when you need OS-level control, custom daemons, or specific Linux distributions. Heavy lifting for standard web apps.',
+    speakerNotes: [
+      'Azure guarantees the physical server and virtualization layer. Everything from the OS up is your responsibility.',
+      'If an OpenSSL vulnerability drops on Monday, you patch the VM. If your app crashes OOM, you configure swap and process monitors.',
+      'This is unmatched power for specialized workloads — but heavy lifting for modern web applications.',
+    ],
+  },
+
+  // ── 2. AZURE APP SERVICE ──────────────────────────────────────────────────
+
   {
     id: 'app-service-statement',
     title: 'Azure App Service',
     section: 'Azure App Service (PaaS)',
     type: 'statement',
-    statement: 'Deploy the application. Let Azure handle the boring parts.',
-    subtitle: 'Moving up the abstraction stack into fully managed Platform as a Service (PaaS).',
-    motifBadge: 'PaaS // Zero OS Mgmt',
+    statement: 'Give Azure your GitHub link. It handles the rest.',
+    subtitle: 'Full-stack web hosting without touching a Linux terminal — pure PaaS.',
+    motifBadge: 'PaaS // Simplest Full-Stack',
+    logos: [{ src: '/assets/icons/azure-app-service.svg', alt: 'Azure App Service' }],
     speakerNotes: [
-      'Next up is Azure App Service, which moves us into PaaS—Platform as a Service.',
-      'App Service is designed specifically for conventional web applications, APIs, and microservices where you want the agility of cloud hosting without manually babysitting the underlying operating system.',
-      'The philosophy changes: Deploy your application code, and let Azure handle the boring parts like OS patching, runtime updates, and load balancing.',
+      'Next up is Azure App Service, which moves us into PaaS.',
+      'If you want to deploy a full-stack web app or a REST API without dealing with Linux terminal configurations, this is usually your go-to option.',
+      'Kung kanina, gumamit tayo ng git clone, ngayon literal na ibibigay na lang natin yung link ng GitHub repository natin kay Microsoft Azure.',
+      'Then, Azure will take care of the deployment process for us.',
     ],
   },
 
-  // SLIDE 6: Azure App Service Supported Technologies & Features
   {
-    id: 'app-service-ecosystem',
-    title: 'First-Class Runtime Ecosystem',
+    id: 'app-service-architecture',
+    title: 'Azure App Service Deployment Flow',
     section: 'Azure App Service (PaaS)',
-    type: 'text-visual',
-    motifBadge: 'Managed Runtimes',
-    contentBlocks: [
-      {
-        heading: 'Managed Polyglot Web Hosting',
-        body: [
-          'Azure App Service provides pre-configured, hardened runtime environments out of the box with zero OS administration.',
-          'Supports both Linux and Windows hosting plans, custom domain mapping, automated SSL certificates, and integrated deployment slots.',
-        ],
-        highlight: 'Built-in auto-healing, load balancing, health checks, and effortless horizontal scaling.',
-      },
-    ],
-    visualCards: [
-      {
-        title: 'SUPPORTED RUNTIMES',
-        tag: 'OFFICIAL STACKS',
-        items: [
-          'Node.js (Express, Nest, Next)',
-          'Python (Django, FastAPI, Flask)',
-          'Java (SE, Spring Boot, Tomcat)',
-          '.NET / .NET Core / ASP.NET',
-          'PHP',
-          'Custom Docker Containers',
-        ],
-      },
-      {
-        title: 'BUILT-IN PLATFORM POWERS',
-        tag: 'PAAS PERKS',
-        items: [
-          'Automated Zero-Downtime Slots',
-          'Free Managed SSL / TLS',
-          'GitHub Actions / Azure DevOps CI/CD',
-          'Automatic Scaling Rules',
-          'Integrated App Insights Telemetry',
-        ],
-      },
+    type: 'architecture',
+    motifBadge: 'Architecture: App Service',
+    summary:
+      'Connect your GitHub repository to App Service. Azure pulls the code, builds the application, and deploys it — no SSH, no Nginx config, no OS management.',
+    diagram: {
+      nodes: [
+        { id: 'gh', label: 'GitHub', sublabel: 'Your Repository', type: 'source' },
+        { id: 'azure', label: 'Azure App Service', sublabel: 'Managed PaaS Runtime', type: 'compute' },
+        { id: 'runtime', label: 'Managed Runtime', sublabel: 'Node / Java / Python / .NET', type: 'compute' },
+        { id: 'users', label: 'End Users', sublabel: 'HTTPS', type: 'user' },
+      ],
+      edges: [
+        { from: 'gh', to: 'azure', label: 'GitHub link / push' },
+        { from: 'azure', to: 'runtime', label: 'build & deploy' },
+        { from: 'runtime', to: 'users', label: 'serve traffic' },
+      ],
+    },
+    highlights: [
+      'No SSH, no Nginx config, no OS patching',
+      'Supports React, Angular, Vue, Node.js, Python, Java, .NET',
+      'Azure builds and deploys from your GitHub repo automatically',
+      'Free managed SSL, custom domains, auto-scaling built in',
     ],
     speakerNotes: [
-      'App Service has first-class native support for all mainstream application stacks: React, Angular, and Vue frontends, Node.js, Python, Java Spring Boot, and .NET APIs.',
-      'You don’t have to install Java 21 or configure Node runtime paths; Azure provisions a secure, optimized runtime container for you.',
-      'You also get enterprise features built right in: free managed SSL certificates, deployment slots for blue/green zero-downtime releases, and automated scaling.',
+      'You can deploy your application directly as code — React, Angular, Vue frontend, or Node.js, Python, Java, .NET backend.',
+      'App Service natively supports multiple platforms and manages the underlying runtime on Linux or Windows.',
+      'Azure will take care of the deployment process: pull the code, build the application, deploy it to the App Service environment.',
     ],
   },
 
-  // SLIDE 7: VM vs App Service Deployment Flow Comparison
   {
-    id: 'vm-vs-appservice-workflow',
-    title: 'Deployment Workflow Comparison',
+    id: 'vm-vs-appservice-comparison',
+    title: 'VM vs App Service: The Workflow Shift',
     section: 'Deployment Comparison',
     type: 'comparison',
-    motifBadge: 'Workflow Shift',
+    motifBadge: 'IaaS → PaaS',
     left: {
-      title: 'Azure Virtual Machine (IaaS)',
-      subtitle: 'Manual / Imperative Workflow',
-      tag: 'SSH & Scripting',
+      title: 'Azure VM (IaaS)',
+      subtitle: 'Manual Workflow',
+      tag: 'SSH & SCRIPTING',
       points: [
-        'Developer SSHes into virtual machine instance.',
-        'Manually configures runtime dependencies and environment variables.',
-        'Runs git clone / git pull and compiles code on the host.',
-        'Restarts systemd service or Docker daemon manually.',
-        'Configures Nginx reverse proxy routing and SSL renewal cron.',
+        'SSH into the VM',
+        'git clone your repository',
+        'Configure runtime & dependencies manually',
+        'Set up Nginx reverse proxy',
+        'Manage SSL certs & systemd restarts',
       ],
     },
     right: {
       title: 'Azure App Service (PaaS)',
-      subtitle: 'Automated / Declarative Workflow',
-      tag: 'Continuous Deployment',
+      subtitle: 'Automated Workflow',
+      tag: 'PUSH TO DEPLOY',
+      isPrimary: true,
       points: [
-        'Developer pushes commit or pull request to GitHub / Azure Repos.',
-        'Pipeline or Oryx engine builds application artifact automatically.',
-        'Azure deploys artifact directly into the managed container runtime.',
-        'Zero SSH access required; platform manages process lifecycle.',
-        'Platform automatically provisions SSL cert and routes traffic to port 80/443.',
+        'Connect your GitHub repository',
+        'Azure pulls, builds, and deploys automatically',
+        'No SSH access needed',
+        'Platform manages runtime, SSL, and scaling',
+        'Focus 100% on your application code',
       ],
     },
     takeaway:
       'PaaS replaces manual server administration with automated, continuous deployment pipelines.',
     speakerNotes: [
-      'Look at how the developer experience transforms between these two models.',
-      'On a VM: Developer → SSH → VM → Configure → Build → Deploy → Configure Nginx.',
-      'On App Service: Developer → Push to Repository → Pipeline / Azure App Service → Live Application.',
-      'Instead of SSHing into a server and running git clone, you connect your GitHub repository, and Azure takes care of building, deploying, and binding the HTTP port automatically.',
+      'Look at how the developer experience transforms.',
+      'VM: Developer → SSH → VM → Configure → Build → Deploy → Configure Nginx.',
+      'App Service: Developer → Push to GitHub → Azure → Live Application.',
+      'Instead of SSHing into a server and running git clone, you connect your GitHub repository and Azure handles everything.',
     ],
   },
 
-  // SLIDE 8: Operational Responsibility Spectrum Slide
   {
-    id: 'operational-tradeoff-spectrum',
-    title: 'Control vs. Convenience Trade-off',
-    section: 'Trade-off Analysis',
-    type: 'comparison',
-    motifBadge: 'Trade-off Spectrum',
-    left: {
-      title: 'Choose Azure VM When:',
-      subtitle: 'Custom Control is Critical',
-      tag: 'High Control',
-      points: [
-        'You need specific OS kernel drivers or custom background Windows/Linux daemons.',
-        'You are lifting and shifting legacy applications with hardcoded host dependencies.',
-        'You require specific network topologies and local database co-location.',
-        'You have dedicated DevOps staff to maintain security updates and OS patching.',
-      ],
-    },
-    right: {
-      title: 'Choose App Service When:',
-      subtitle: 'Developer Velocity is Priority',
-      tag: 'High Velocity',
-      points: [
-        'You are building standard web apps, REST APIs, or single-page application backends.',
-        'You want push-to-deploy CI/CD without managing server infrastructure.',
-        'You need staging/production deployment slots with instant rollback.',
-        'You prefer focusing 100% of engineering bandwidth on product features.',
-      ],
-    },
-    takeaway:
-      'App Service is not strictly "better" than a VM—they represent distinct operational trade-offs on the cloud continuum.',
-    speakerNotes: [
-      'It is crucial not to view this as "App Service is modern, so VMs are bad". It is about matching your operational model to your application requirements.',
-      'If you have custom background daemons, specific OS requirements, or legacy lift-and-shift workloads, a VM gives you the exact control you need.',
-      'If you are building standard web applications and APIs, App Service removes massive operational toil so your team can focus on shipping value.',
-    ],
-  },
-
-  // SLIDE 9: Transition to Containers Slide
-  {
-    id: 'transition-to-containers',
-    title: 'What If We Need Both Portability and Simplicity?',
-    section: 'Next Horizon',
+    id: 'transition-to-functions',
+    title: 'What If We Only Need to Run One Piece of Code?',
+    section: 'Next: Serverless',
     type: 'section-header',
     sectionNumber: '03',
-    description: 'Bridging the gap between VM control and PaaS convenience with Containers.',
-    motifBadge: 'Next: Containers',
+    description:
+      'Moving from continuously running servers to on-demand, event-driven execution with Azure Functions.',
+    motifBadge: 'Next: Serverless',
     speakerNotes: [
-      'We have seen the two extremes of traditional hosting: the raw control of Virtual Machines and the simplicity of App Service.',
-      'But what happens when our application dependencies become more complex, and we want standardized portability across any environment?',
-      'That brings us to the next stage of our deployment evolution: Containerized Deployments with Azure Container Apps and Kubernetes!',
+      'We have seen the two extremes of traditional hosting: the raw control of VMs and the simplicity of App Service.',
+      'But what if we do not need a full server running 24/7? What if we only need to run one piece of code when something happens?',
+      'That brings us to the next stage: Serverless with Azure Functions.',
     ],
   },
 ];
