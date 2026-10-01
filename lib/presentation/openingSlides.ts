@@ -114,7 +114,7 @@ export const openingSlides: SlideData[] = [
       nodes: [
         { id: 'lorawan',   label: 'LoRaWAN Nodes',    sublabel: 'field sensors',        type: 'source',  status: 'active' },
         { id: 'edge',      label: 'Edge Node',         sublabel: 'autonomous decisions',  type: 'compute', status: 'active' },
-        { id: 'api',       label: 'Java Backend API',  sublabel: 'Spring Boot',           type: 'storage', status: 'active' },
+        { id: 'api',       label: 'Java Backend API',  sublabel: 'Spring Boot',           type: 'storage', status: 'active', icon: { src: '/assets/icons/java.webp', alt: 'Java' } },
         { id: 'ws',        label: 'WebSocket Stream',  sublabel: 'real-time events',      type: 'network', status: 'active' },
         { id: 'frontend',  label: 'Flutter App',       sublabel: 'Dart / Android / iOS', type: 'user',    status: 'active' },
         { id: 'user',      label: 'Farm Operator',     sublabel: 'mobile phone',          type: 'badge',   status: 'neutral' },

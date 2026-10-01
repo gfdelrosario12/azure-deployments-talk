@@ -78,7 +78,13 @@ export function TextVisualSlide({ slide }: { slide: TextVisualSlideData }) {
                       : 'text-base font-semibold text-white font-mono flex items-center gap-2'
                   }
                 >
-                  <span className="text-cyan-400">#</span> {block.heading}
+                  <span className="text-cyan-400">#</span>
+                  {block.icon && (
+                    <span className="relative inline-block w-5 h-5 shrink-0 rounded bg-white/90 p-0.5">
+                      <Image src={block.icon.src} alt={block.icon.alt} fill className="object-contain" sizes="20px" />
+                    </span>
+                  )}
+                  {block.heading}
                 </h3>
               )}
               <div className="space-y-1.5">

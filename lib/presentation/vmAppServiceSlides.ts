@@ -91,6 +91,7 @@ export const vmAppServiceSlides: SlideData[] = [
       },
       {
         heading: 'Java Spring Boot API',
+        icon: { src: '/assets/icons/java.webp', alt: 'Java' },
         body: [
           'FROM eclipse-temurin:21-jre-alpine',
           'WORKDIR /app',
@@ -221,6 +222,52 @@ export const vmAppServiceSlides: SlideData[] = [
       'You can deploy your application directly as code — React, Angular, Vue frontend, or Node.js, Python, Java, .NET backend.',
       'App Service natively supports multiple platforms and manages the underlying runtime on Linux or Windows.',
       'Azure will take care of the deployment process: pull the code, build the application, deploy it to the App Service environment.',
+    ],
+  },
+
+  {
+    id: 'app-service-public-endpoints',
+    title: 'Making the API Public: Domain or Public IP',
+    section: 'Azure App Service (PaaS)',
+    type: 'architecture',
+    motifBadge: 'Exposing the API',
+    summary:
+      'Once deployed, the API still lives on an Azure-provided hostname. To let the Flutter app and the outside world reach it, you expose it two ways: bind a custom domain, or just use the public IP Azure hands you.',
+    diagram: {
+      nodes: [
+        { id: 'azure',    label: 'Azure App Service', sublabel: 'your Spring Boot API', type: 'compute', status: 'active' },
+        { id: 'domain',   label: 'Custom Domain',      sublabel: 'api.aquadflow.app',   type: 'network' },
+        { id: 'ip',       label: 'Public IP',          sublabel: '20.x.x.x:8080',       type: 'network' },
+        { id: 'dns',      label: 'DNS / A Record',     sublabel: 'domain → App Service', type: 'network' },
+        { id: 'frontend', label: 'Flutter App',        sublabel: 'Dart client',         type: 'user', status: 'active' },
+      ],
+      edges: [
+        { from: 'domain', to: 'azure', label: 'HTTPS + custom SSL', animated: false },
+        { from: 'dns',    to: 'domain', label: 'point the record', animated: false },
+        { from: 'ip',     to: 'azure', label: 'default outbound',   animated: false },
+        { from: 'frontend', to: 'domain', label: 'calls the API',   animated: true },
+        { from: 'frontend', to: 'ip',   label: 'or plain IP',    animated: false },
+      ],
+    },
+    highlights: [
+      'Custom domain: bind api.yourdomain.com with managed SSL — the professional choice',
+      'Public IP: Azure gives you an address immediately — fine for demos and thesis defenses',
+      'Either way the endpoints below become reachable from the frontend',
+    ],
+    speakerNotes: [
+      'So once the API is deployed, there is one more step before the frontend can talk to it: it has to be reachable from outside Azure.',
+      'You have two options. The first is a custom domain — you buy a domain, add a DNS A record that points to your App Service, and then bind it inside App Service. Azure issues the SSL certificate for you automatically.',
+      'That is the professional choice, and that is what you would use in production.',
+      'The second option is much simpler: App Service already gives you a public IP. You can just use that raw IP address to reach your endpoints.',
+      'That is not something you would ship, but it is perfect for a demo or for a thesis defense, because you can hand somebody an IP and a port and it works.',
+      'Now, what does "the endpoints" actually mean? It is just your REST API — the AquaFlow Spring Boot backend.',
+      'Every endpoint you write in that backend becomes a URL under the base address.',
+      'So if your base is the App Service hostname, then GET /api/paddies gives you every rice paddy, GET /api/paddies/{id} gives you one specific paddy, GET /api/users gives you the users, and POST /api/users registers a new one.',
+      'Add GET /api/readings for sensor telemetry, GET /api/irrigation/status for the current AWD state, and you have GET /api/health for uptime checks.',
+      'And that is the connection: in the Flutter app you set one base URL — like const String apiBase = "https://api.aquadflow.app" — and then every call in your app is just apiBase plus the path.',
+      'So the Flutter app calls GET $apiBase/api/paddies, and the App Service answers with JSON.',
+      'And because I told you earlier the backend also pushes real-time events over WebSocket, that same base URL handles the live stream too.',
+      'One deployment, one base URL, every endpoint — that is the whole contract between your frontend and your backend.',
     ],
   },
 

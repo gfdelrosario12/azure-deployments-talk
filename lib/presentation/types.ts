@@ -16,6 +16,7 @@ export interface DiagramNode {
   sublabel?: string;
   type?: 'source' | 'compute' | 'storage' | 'network' | 'user' | 'badge';
   status?: 'active' | 'success' | 'warning' | 'neutral';
+  icon?: { src: string; alt: string };
 }
 
 export interface DiagramEdge {
@@ -74,6 +75,8 @@ export interface TextVisualSlideData extends BaseSlide {
     heading?: string;
     body: string[];
     highlight?: string;
+    /** Logo rendered beside the heading. */
+    icon?: { src: string; alt: string };
     /** Renders the block as an emphasised definition panel instead of a code example. */
     accent?: boolean;
     /** Renders each body line with a bullet marker. */

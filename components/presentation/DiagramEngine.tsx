@@ -204,6 +204,7 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
   const SUB_FS    = 8;
   const SUB_CPX   = 4.8;
   const TYPE_FS   = 6.5;
+  const ICON_SIZE = 16;
 
   const { cx, cy, totalW, totalH } = layout(nodes, edges, NW, NH, CGAP, RGAP);
 
@@ -297,9 +298,10 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
 
           const labelH   = labelLines.length * (LABEL_FS + 3);
           const subH     = subLines.length   * (SUB_FS   + 2);
+          const iconH    = node.icon ? ICON_SIZE + 4 : 0;
           const innerH   = NH - 16;
-          const contentH = labelH + (subLines.length > 0 ? 4 + subH : 0);
-          const labelStartY = ny + 16 + (innerH - contentH) / 2 + LABEL_FS;
+          const contentH = labelH + (subLines.length > 0 ? 4 + subH : 0) + iconH;
+          const labelStartY = ny + 16 + (innerH - contentH) / 2 + LABEL_FS + iconH;
 
           return (
             <g key={node.id} clipPath={`url(#clip-${node.id})`}>
@@ -307,6 +309,12 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
               <text x={ncx} y={ny + 11} textAnchor="middle" fontSize={TYPE_FS} fontFamily="monospace" fill={c.type} letterSpacing="1">
                 {(node.type ?? 'node').toUpperCase()}
               </text>
+              {node.icon && (
+                <g transform={`translate(${ncx - ICON_SIZE / 2}, ${labelStartY - iconH})`}>
+                  <rect x={-2} y={-2} width={ICON_SIZE + 4} height={ICON_SIZE + 4} rx={3} fill="#ffffff" fillOpacity="0.92" />
+                  <image href={node.icon.src} x={0} y={0} width={ICON_SIZE} height={ICON_SIZE} preserveAspectRatio="xMidYMid meet" />
+                </g>
+              )}
               {labelLines.map((line, li) => (
                 <text key={li} x={ncx} y={labelStartY + li * (LABEL_FS + 3)} textAnchor="middle" fontSize={LABEL_FS} fontFamily="monospace" fontWeight="700" fill={c.text}>
                   {line}
