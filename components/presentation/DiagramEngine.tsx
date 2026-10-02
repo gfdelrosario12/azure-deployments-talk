@@ -306,9 +306,11 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
           return (
             <g key={node.id} clipPath={`url(#clip-${node.id})`}>
               <rect x={nx} y={ny} width={NW} height={NH} rx="7" fill={c.bg} stroke={c.border} strokeWidth="1.5" strokeOpacity="0.7" />
-              <text x={ncx} y={ny + 11} textAnchor="middle" fontSize={TYPE_FS} fontFamily="monospace" fill={c.type} letterSpacing="1">
-                {(node.type ?? 'node').toUpperCase()}
-              </text>
+              {!node.hideType && (
+                <text x={ncx} y={ny + 11} textAnchor="middle" fontSize={TYPE_FS} fontFamily="monospace" fill={c.type} letterSpacing="1">
+                  {(node.type ?? 'node').toUpperCase()}
+                </text>
+              )}
               {node.icon && (
                 <g transform={`translate(${ncx - ICON_SIZE / 2}, ${labelStartY - iconH})`}>
                   <rect x={-2} y={-2} width={ICON_SIZE + 4} height={ICON_SIZE + 4} rx={3} fill="#ffffff" fillOpacity="0.92" />

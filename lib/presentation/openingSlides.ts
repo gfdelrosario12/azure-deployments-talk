@@ -114,7 +114,7 @@ export const openingSlides: SlideData[] = [
       nodes: [
         { id: 'lorawan',   label: 'LoRaWAN Nodes',    sublabel: 'field sensors',        type: 'source',  status: 'active' },
         { id: 'edge',      label: 'Edge Node',         sublabel: 'autonomous decisions',  type: 'compute', status: 'active' },
-        { id: 'api',       label: 'Java Backend API',  sublabel: 'Spring Boot',           type: 'storage', status: 'active', icon: { src: '/assets/icons/java.webp', alt: 'Java' } },
+        { id: 'api',       label: 'Java Backend API',  sublabel: 'Spring Boot',           type: 'storage', status: 'active', hideType: true },
         { id: 'ws',        label: 'WebSocket Stream',  sublabel: 'real-time events',      type: 'network', status: 'active' },
         { id: 'frontend',  label: 'Flutter App',       sublabel: 'Dart / Android / iOS', type: 'user',    status: 'active' },
         { id: 'user',      label: 'Farm Operator',     sublabel: 'mobile phone',          type: 'badge',   status: 'neutral' },
@@ -130,7 +130,7 @@ export const openingSlides: SlideData[] = [
     },
     highlights: [
       'Frontend: Flutter mobile app (Dart — Android / iOS)',
-      'Backend: Java Spring Boot REST API',
+      { text: 'Backend: Java Spring Boot REST API', logo: '/assets/icons/java.webp' },
     ],
     speakerNotes: [
       'So this is the system I need to deploy — AquaFlow, my thesis project.',
@@ -141,6 +141,61 @@ export const openingSlides: SlideData[] = [
       'So the deployment question is: how do I ship the Flutter app to real users, and where do I put the Java API? That is exactly what this talk answers.',
     ],
   },
+  {
+    id: 'thesis-localhost-code',
+    title: 'AquaFlow on localhost',
+    section: 'Introduction',
+    type: 'code-compare',
+    motifBadge: 'localhost:8080',
+    summary:
+      'Right now, the Flutter app calls the Spring Boot API on localhost:8080. That URL only resolves on one machine — mine. No teammates, no real users, no 24/7 availability.',
+    before: {
+      label: 'Flutter app — calling the backend right now',
+      code: `// lib/services/alert_service.dart
+Future<List<Alert>> getAlerts() async {
+  final response = await http.get(
+    Uri.parse("http://localhost:8080/api/v1/alerts"),
+  );
+
+  return (jsonDecode(response.body) as List)
+      .map((e) => Alert.fromJson(e))
+      .toList();
+}`,
+    },
+    after: {
+      label: 'What it looks like after deployment',
+      code: `// lib/services/alert_service.dart
+Future<List<Alert>> getAlerts() async {
+  try {
+    final response = await http.get(
+      Uri.parse("https://api.aquaflow.app/api/v1/alerts"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to fetch alerts: \${response.statusCode}");
+    }
+
+    return (jsonDecode(response.body) as List)
+        .map((e) => Alert.fromJson(e))
+        .toList();
+  } catch (e) {
+    debugPrint("Error fetching alerts: \$e");
+    return [];
+  }
+}`,
+    },
+    callout:
+      'The code is identical — only the URL changes. Deployment is what makes that URL real.',
+    speakerNotes: [
+      'Here is the most concrete way to understand the problem.',
+      'This is actual code from AquaFlow — the Flutter app calling the Spring Boot backend.',
+      'On the left: localhost:8080. That URL only resolves on my laptop. My phone cannot hit it. My teammates cannot hit it. No one can.',
+      'On the right: what that same call looks like after deployment — api.aquaflow.app, a real domain, reachable by anyone.',
+      'The logic is identical. The only thing that changes is the URL.',
+      'And that is exactly what the rest of this talk is about — how do we get from the left side to the right side using Azure.',
+    ],
+  },
+
   {
     id: 'deployment-problem-statement',
     title: 'The Localhost Illusion',

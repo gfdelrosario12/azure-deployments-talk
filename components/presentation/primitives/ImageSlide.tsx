@@ -6,7 +6,7 @@ import { ImageSlideData } from '@/lib/presentation/types';
 
 export function ImageSlide({ slide }: { slide: ImageSlideData }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 sm:px-12 animate-fadeIn">
+    <div className="h-full flex flex-col items-center justify-center px-6 sm:px-12 py-6 animate-fadeIn">
       <div className="relative max-w-5xl w-full rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl">
         <Image
           src={slide.image.src}

@@ -8,7 +8,8 @@ export type SlideType =
   | 'case-study'
   | 'closing-takeaway'
   | 'socials'
-  | 'image';
+  | 'image'
+  | 'code-compare';
 
 export interface DiagramNode {
   id: string;
@@ -17,6 +18,7 @@ export interface DiagramNode {
   type?: 'source' | 'compute' | 'storage' | 'network' | 'user' | 'badge';
   status?: 'active' | 'success' | 'warning' | 'neutral';
   icon?: { src: string; alt: string };
+  hideType?: boolean;
 }
 
 export interface DiagramEdge {
@@ -95,7 +97,7 @@ export interface ArchitectureSlideData extends BaseSlide {
   summary: string;
   diagram: DiagramData;
   secondaryDiagram?: DiagramData;
-  highlights?: string[];
+  highlights?: (string | { text: string; logo?: string })[];
 }
 
 export interface ComparisonItem {
@@ -153,6 +155,22 @@ export interface ImageSlideData extends BaseSlide {
   };
 }
 
+export interface CodeCompareSlideData extends BaseSlide {
+  type: 'code-compare';
+  summary?: string;
+  before: {
+    label: string;
+    language?: string;
+    code: string;
+  };
+  after: {
+    label: string;
+    language?: string;
+    code: string;
+  };
+  callout?: string;
+}
+
 export interface SocialLink {
   id: string;
   label: string;
@@ -190,4 +208,5 @@ export type SlideData =
   | CaseStudySlideData
   | ClosingTakeawaySlideData
   | ImageSlideData
-  | SocialsSlideData;
+  | SocialsSlideData
+  | CodeCompareSlideData;

@@ -32,12 +32,12 @@ const ICONS: Record<SocialsSlideData['socials'][number]['icon'], React.ReactNode
 
 export function SocialsSlide({ slide }: { slide: SocialsSlideData }) {
   return (
-    <div className="w-full flex flex-col items-center justify-center text-center px-6 sm:px-10 py-4 animate-fadeIn overflow-hidden">
-      <span className="font-mono text-xs tracking-widest uppercase text-cyan-400/80 border border-cyan-500/30 bg-cyan-950/40 px-3 py-1 rounded mb-3">
+    <div className="h-full flex flex-col items-center justify-center text-center px-4 sm:px-8 py-3 animate-fadeIn">
+      <span className="font-mono text-sm tracking-widest uppercase text-cyan-400/80 border border-cyan-500/30 bg-cyan-950/40 px-4 py-1.5 rounded mb-2">
         {slide.section}
       </span>
 
-      <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white font-mono text-center">
+      <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white font-mono text-center">
         <span className="text-cyan-500 mr-3 select-none">&gt;</span>
         <span className="bg-gradient-to-r from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent">
           {slide.headline}
@@ -45,13 +45,13 @@ export function SocialsSlide({ slide }: { slide: SocialsSlideData }) {
       </h2>
 
       {slide.subline && (
-        <p className="text-zinc-300 text-sm sm:text-base font-light mt-2 text-center max-w-2xl">
+        <p className="text-zinc-300 text-xl font-light mt-2 text-center max-w-2xl">
           {slide.subline}
         </p>
       )}
 
       {slide.speaker && (
-        <div className="mt-5 flex items-center justify-center gap-5 px-6 py-4 rounded-xl border border-cyan-500/25 bg-cyan-950/10 w-full max-w-3xl mx-auto">
+        <div className="mt-3 flex items-center justify-center gap-5 px-5 py-3 rounded-xl border border-cyan-500/25 bg-cyan-950/10 w-full max-w-3xl mx-auto">
           <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 border-2 border-cyan-500/50 shadow-lg shadow-cyan-950/40">
             <Image
               src={slide.speaker.src}
@@ -63,15 +63,12 @@ export function SocialsSlide({ slide }: { slide: SocialsSlideData }) {
             />
           </div>
           <div className="min-w-0 text-center">
-            <div className="font-mono text-base sm:text-lg font-bold text-white">
+            <div className="font-mono text-xl sm:text-2xl font-bold text-white">
               {slide.speaker.name}
             </div>
-            <ul className="mt-1.5 space-y-1">
+            <ul className="mt-1 space-y-0.5">
               {slide.speaker.titles.map((title) => (
-                <li
-                  key={title}
-                  className="font-mono text-[11px] sm:text-xs text-zinc-300 leading-snug"
-                >
+                <li key={title} className="font-mono text-base text-zinc-300 leading-snug">
                   {title}
                 </li>
               ))}
@@ -80,23 +77,23 @@ export function SocialsSlide({ slide }: { slide: SocialsSlideData }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mt-5 w-full max-w-5xl mx-auto justify-items-center">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-3 w-full max-w-5xl mx-auto justify-items-center">
         {slide.socials.map((social) => (
           <a
             key={social.id}
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-cyan-500/50 hover:bg-zinc-900 transition-colors"
+            className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-cyan-500/50 hover:bg-zinc-900 transition-colors w-full"
           >
             <div className="flex items-center justify-center gap-2 w-full min-w-0">
-              <span className="w-4 h-4 shrink-0 text-cyan-400">
+              <span className="w-5 h-5 shrink-0 text-cyan-400">
                 {ICONS[social.icon]}
               </span>
-              <span className="font-mono text-xs font-bold text-white truncate">{social.label}</span>
+              <span className="font-mono text-sm font-bold text-white truncate">{social.label}</span>
             </div>
-            <QrCode src={social.qrSrc} alt={`QR code for ${social.label}`} size={120} />
-            <span className="font-mono text-[10px] text-zinc-400 text-center truncate w-full">{social.handle}</span>
+            <QrCode src={social.qrSrc} alt={`QR code for ${social.label}`} size={130} />
+            <span className="font-mono text-xs text-zinc-400 text-center truncate w-full">{social.handle}</span>
           </a>
         ))}
 
@@ -104,19 +101,19 @@ export function SocialsSlide({ slide }: { slide: SocialsSlideData }) {
           href={slide.presentation.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/20 hover:border-emerald-400 hover:bg-emerald-950/40 transition-colors"
+          className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/20 hover:border-emerald-400 hover:bg-emerald-950/40 transition-colors w-full"
         >
           <div className="flex items-center justify-center gap-2 w-full min-w-0">
-            <span className="w-4 h-4 shrink-0 text-emerald-400">
+            <span className="w-5 h-5 shrink-0 text-emerald-400">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-full h-full">
                 <rect x="2" y="4" width="20" height="13" rx="2" />
                 <path d="M8 21h8M12 17v4" />
               </svg>
             </span>
-            <span className="font-mono text-xs font-bold text-white truncate">{slide.presentation.label}</span>
+            <span className="font-mono text-sm font-bold text-white truncate">{slide.presentation.label}</span>
           </div>
-          <QrCode src={slide.presentation.qrSrc} alt={`QR code for ${slide.presentation.label}`} size={120} />
-          <span className="font-mono text-[10px] text-emerald-300/80 text-center truncate w-full">
+          <QrCode src={slide.presentation.qrSrc} alt={`QR code for ${slide.presentation.label}`} size={130} />
+          <span className="font-mono text-xs text-emerald-300/80 text-center truncate w-full">
             Scan for this deck
           </span>
         </a>

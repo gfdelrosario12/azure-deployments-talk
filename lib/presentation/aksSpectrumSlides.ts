@@ -119,6 +119,88 @@ export const aksSpectrumSlides: SlideData[] = [
   },
 
   {
+    id: 'aks-full-deployment',
+    title: 'AKS: Full Deployment Walkthrough',
+    section: 'Azure Kubernetes Service (AKS)',
+    type: 'text-visual',
+    motifBadge: 'end-to-end: AKS',
+    contentBlocks: [
+      {
+        heading: '1. Provision the Cluster',
+        bulleted: true,
+        body: [
+          'az aks create --name aquaflow-aks --resource-group aquaflow-rg --node-count 2 --node-vm-size Standard_B2s --generate-ssh-keys',
+          'az aks get-credentials --name aquaflow-aks --resource-group aquaflow-rg  —  writes kubeconfig.',
+          'Attach ACR: az aks update --attach-acr aquaflowacr  —  grants AcrPull to the cluster.',
+          'kubectl get nodes  —  verify both nodes are Ready.',
+        ],
+      },
+      {
+        heading: '2. Secrets & ConfigMaps',
+        bulleted: true,
+        body: [
+          'kubectl create secret generic aquaflow-secrets --from-literal=DB_PASSWORD=<val> --from-literal=JWT_SECRET=<val>',
+          'kubectl create configmap aquaflow-config --from-literal=DB_URL=jdbc:postgresql://... --from-literal=SPRING_PROFILES_ACTIVE=prod',
+          'Reference in Deployment spec via envFrom: secretRef and configMapRef.',
+          'Never hardcode secrets in YAML manifests — use sealed-secrets or Azure Key Vault CSI driver for production.',
+        ],
+      },
+      {
+        heading: '3. Deployment & Service Manifests',
+        bulleted: true,
+        body: [
+          'Deployment: kind: Deployment, spec.containers.image: aquaflowacr.azurecr.io/aquaflow-api:latest, containerPort: 8080, replicas: 2.',
+          'Service: kind: Service, spec.type: ClusterIP, port: 80, targetPort: 8080  —  internal load balancer.',
+          'kubectl apply -f deployment.yaml -f service.yaml',
+          'kubectl rollout status deployment/aquaflow-api  —  wait for rollout.',
+        ],
+      },
+      {
+        heading: '4. Ingress Controller + SSL',
+        bulleted: true,
+        body: [
+          'helm install ingress-nginx ingress-nginx/ingress-nginx  —  installs NGINX Ingress Controller.',
+          'kubectl get svc ingress-nginx-controller  —  copy the EXTERNAL-IP (Azure Load Balancer IP).',
+          'Add DNS A record: api.aquaflow.app → <EXTERNAL-IP>.',
+          'helm install cert-manager jetstack/cert-manager --set installCRDs=true',
+          'Apply ClusterIssuer (Let\'s Encrypt) + Ingress manifest with tls: hosts and secretName.',
+          'cert-manager auto-issues and renews the SSL certificate.',
+        ],
+      },
+    ],
+    visualCards: [
+      {
+        title: 'INGRESS YAML',
+        tag: 'KEY CONFIG',
+        items: [
+          'annotations: cert-manager.io/cluster-issuer: letsencrypt',
+          'rules: host: api.aquaflow.app',
+          'tls: hosts + secretName',
+          'path: / → service: aquaflow-api:80',
+        ],
+      },
+      {
+        title: 'VERIFY',
+        tag: 'SMOKE TEST',
+        items: [
+          'kubectl get pods — all Running',
+          'kubectl get ingress — check ADDRESS',
+          'kubectl describe certificate — Ready: True',
+          'curl https://api.aquaflow.app/actuator/health',
+        ],
+      },
+    ],
+    speakerNotes: [
+      'AKS has the most steps — but each step is explicit and repeatable.',
+      'Step one: provision the cluster and attach ACR so it can pull your images without credentials.',
+      'Step two: create Kubernetes Secrets and ConfigMaps for all environment variables — never put them in YAML files you commit.',
+      'Step three: write a Deployment manifest and a ClusterIP Service manifest, apply them with kubectl.',
+      'Step four: install NGINX Ingress Controller via Helm, get the external IP, set your DNS A record, then install cert-manager and apply a ClusterIssuer and Ingress manifest with TLS config.',
+      'cert-manager handles the Let\'s Encrypt certificate automatically from that point on.',
+    ],
+  },
+
+  {
     id: 'aks-tradeoff',
     title: 'The AKS Trade-off',
     section: 'Azure Kubernetes Service (AKS)',
@@ -155,6 +237,79 @@ export const aksSpectrumSlides: SlideData[] = [
       'Microservices are a common use case for Kubernetes — but microservices do NOT automatically require Kubernetes.',
       'Container Apps handles the majority of microservice setups without cluster management overhead.',
       'Choose AKS when you truly need custom cluster-level networking, CRDs, or specialized workloads.',
+    ],
+  },
+
+  {
+    id: 'common-deployment-requirements',
+    title: 'Common Requirements Across All Methods',
+    section: 'The Azure Deployment Spectrum',
+    type: 'text-visual',
+    motifBadge: 'shared infrastructure',
+    contentBlocks: [
+      {
+        heading: 'DNS & Custom Domain',
+        bulleted: true,
+        body: [
+          'Every method needs an A record: api.aquaflow.app → your service\'s public IP or FQDN.',
+          'VM / AKS: copy the public IP from Azure Portal or kubectl get svc.',
+          'App Service / Container Apps: use the CNAME or A record shown in the Custom Domains blade.',
+          'DNS propagation takes 1–15 minutes — set it up before configuring SSL.',
+        ],
+      },
+      {
+        heading: 'SSL / TLS',
+        bulleted: true,
+        body: [
+          'VM: certbot --nginx -d api.aquaflow.app  —  Let\'s Encrypt, auto-renews.',
+          'App Service / Container Apps: managed certificate — Azure issues and renews for free.',
+          'AKS: cert-manager + ClusterIssuer (Let\'s Encrypt) — auto-issues on Ingress creation.',
+          'Always enable HTTPS-only / redirect HTTP → HTTPS.',
+        ],
+      },
+      {
+        heading: 'Environment Variables & Secrets',
+        bulleted: true,
+        body: [
+          'Never commit secrets to Git. Use .env files locally, platform settings in production.',
+          'VM: /etc/aquaflow.env loaded by systemd EnvironmentFile.',
+          'App Service: Settings → Environment Variables (Application Settings).',
+          'Container Apps: az containerapp secret set + secretRef in env vars.',
+          'AKS: kubectl create secret generic + envFrom.secretRef in Deployment spec.',
+        ],
+      },
+      {
+        heading: 'CORS (Cross-Origin Resource Sharing)',
+        bulleted: true,
+        body: [
+          'Required when frontend and backend are on different domains.',
+          'Spring Boot: @CrossOrigin(origins = "https://app.aquaflow.app") or WebMvcConfigurer.',
+          'App Service: API → CORS blade — add allowed origins.',
+          'AKS / Container Apps: configure in application code or Nginx config.',
+        ],
+      },
+    ],
+    visualCards: [
+      {
+        title: 'REQUIRED FOR ALL',
+        tag: 'CHECKLIST',
+        items: [
+          'DNS A record set',
+          'SSL certificate active',
+          'Env vars configured',
+          'HTTPS-only enabled',
+          'CORS allowed origins set',
+          'Health endpoint responding',
+        ],
+      },
+    ],
+    speakerNotes: [
+      'Regardless of which deployment method you choose, these requirements apply to all of them.',
+      'DNS: you need an A record pointing your domain at the service before SSL can be issued.',
+      'SSL: the mechanism differs per platform but the outcome is the same — HTTPS with a valid cert.',
+      'Environment variables: the storage location differs, but the rule is universal — never in code, never in Git.',
+      'CORS: if your Flutter web app and your Spring Boot API are on different domains, you must explicitly allow the frontend origin in the backend.',
+      'These are the things that are easy to forget and will break your deployment even if the code is perfect.',
     ],
   },
 
@@ -214,6 +369,176 @@ export const aksSpectrumSlides: SlideData[] = [
       'We transitioned to event-driven compute with Functions, decoupled our frontend with Static Web Apps.',
       'Then we adopted containers with Container Apps and scaled up to full cluster orchestration with AKS.',
       'Azure gives us different deployment options — from Virtual Machines, App Service, Functions, Containers, to Kubernetes.',
+    ],
+  },
+
+  {
+    id: 'aquaflow-url-change',
+    title: 'Remember This? Now It Works.',
+    section: 'The Azure Deployment Spectrum',
+    type: 'code-compare',
+    motifBadge: 'localhost → production',
+    summary:
+      'At the start of this talk, the Flutter app was calling localhost:8080. After everything we just covered — App Service, Container Apps, AKS — that same call now points to a real domain.',
+    before: {
+      label: 'Opening slide — localhost:8080, only your machine',
+      code: `// lib/services/alert_service.dart
+Future<List<Alert>> getAlerts() async {
+  final response = await http.get(
+    Uri.parse("http://localhost:8080/api/v1/alerts"),
+  );
+
+  return (jsonDecode(response.body) as List)
+      .map((e) => Alert.fromJson(e))
+      .toList();
+}`,
+    },
+    after: {
+      label: 'After deployment — api.aquaflow.app, live for everyone',
+      code: `// lib/services/alert_service.dart
+Future<List<Alert>> getAlerts() async {
+  try {
+    final response = await http.get(
+      Uri.parse("https://api.aquaflow.app/api/v1/alerts"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to fetch alerts: \${response.statusCode}");
+    }
+
+    return (jsonDecode(response.body) as List)
+        .map((e) => Alert.fromJson(e))
+        .toList();
+  } catch (e) {
+    debugPrint("Error fetching alerts: \$e");
+    return [];
+  }
+}`,
+    },
+    callout:
+      'Same code. Same logic. One URL change — and that URL is now real because you deployed.',
+    speakerNotes: [
+      'Remember the code we showed at the very beginning of this talk?',
+      'The Flutter app calling localhost:8080 — a URL that only resolves on one machine.',
+      'We have now covered every Azure deployment option that can turn that into a real domain.',
+      'App Service: push your JAR, get a URL. Container Apps: containerize it, get a URL. AKS: full cluster, still just a URL at the end.',
+      'The Flutter code does not change. The Spring Boot logic does not change.',
+      'You deploy, you point the app at the real domain, and now every user — every phone, every browser — can reach it.',
+      'That is what deployment means.',
+    ],
+  },
+
+  {
+    id: 'aquaflow-deployed',
+    title: 'AquaFlow — Now Live',
+    section: 'The Azure Deployment Spectrum',
+    type: 'architecture',
+    motifBadge: 'localhost → production',
+    summary:
+      'Once deployed, every controller in the Spring Boot backend becomes a real, reachable HTTP endpoint. Clients — the Flutter mobile app or any HTTP consumer — call the backend domain directly. The frontend reaches users through its own deployed URL.',
+    diagram: {
+      nodes: [
+        { id: 'client',   label: 'Flutter App',        sublabel: 'mobile / web client',   type: 'user' },
+        { id: 'api',      label: 'Java Spring Boot API', sublabel: 'api.aquaflow.app',      type: 'compute', hideType: true },
+        { id: 'frontend', label: 'Flutter / Web UI',    sublabel: 'app.aquaflow.app',       type: 'source' },
+      ],
+      edges: [
+        { from: 'client',   to: 'api',      label: 'REST calls', animated: true },
+        { from: 'client',   to: 'frontend', label: 'opens app',  animated: false },
+      ],
+    },
+    highlights: [
+      'Before deployment: only reachable on localhost:8080',
+      'After deployment: live on a real domain, 24/7',
+      { text: 'Backend: 16 REST controllers, all publicly reachable', logo: '/assets/icons/java.webp' },
+      'Frontend: served globally via Azure — any device, anywhere',
+    ],
+    speakerNotes: [
+      'This is the whole point of everything we just covered.',
+      'Before deployment, your Spring Boot API only answers on localhost:8080 — only you can reach it.',
+      'After deployment to Azure App Service, Container Apps, or AKS, that same API is live on a real domain.',
+      'Every single one of those 16 controllers — AuthController, FieldController, SensorDataController, IrrigationController, and all the rest — is now a real HTTP endpoint that your Flutter app, your teammates, or any authorized client can call.',
+      'The frontend is served globally through Azure — any device, any browser, anywhere in the world.',
+      'That is what deployment actually means. Not just running code. Making it available.',
+    ],
+  },
+
+  {
+    id: 'aquaflow-api-surface',
+    title: 'AquaFlow API — 16 Controllers, All Live',
+    section: 'The Azure Deployment Spectrum',
+    type: 'text-visual',
+    motifBadge: 'api.aquaflow.app',
+    contentBlocks: [
+      {
+        heading: 'Auth & Users',
+        bulleted: true,
+        body: [
+          'AuthController — login, register, token refresh',
+          'UserService — user management',
+        ],
+      },
+      {
+        heading: 'Field & Zone Management',
+        bulleted: true,
+        body: [
+          'FieldController — create and manage rice paddy fields',
+          'ZoneController — monitoring zones within fields',
+          'CropController — crop types and growth stages',
+        ],
+      },
+      {
+        heading: 'Irrigation & AWD Control',
+        bulleted: true,
+        body: [
+          'IrrigationController — trigger and monitor irrigation',
+          'IrrigationDecisionController — AWD decision records',
+          'IrrigationScheduleController — automated schedules',
+          'AwdConfigController — threshold configuration',
+          'CommandStateMachineController — irrigation command lifecycle',
+        ],
+      },
+      {
+        heading: 'IoT & Telemetry',
+        bulleted: true,
+        body: [
+          'SensorDataController — sensor readings and history',
+          'TelemetryIngestionController — ingest LoRaWAN payloads',
+          'DeviceController — IoT device registry',
+          'EdgeNodeRegistryController — edge node management',
+          'EdgeNodeSyncController — config sync to edge nodes',
+        ],
+      },
+    ],
+    visualCards: [
+      {
+        title: 'ACCESS POINTS',
+        tag: 'AFTER DEPLOY',
+        items: [
+          'REST API — api.aquaflow.app',
+          'WebSocket — real-time events',
+          'Flutter App — app.aquaflow.app',
+          'MQTT — edge node ingestion',
+          'OpenAPI docs — /swagger-ui',
+        ],
+      },
+      {
+        title: 'BEFORE DEPLOY',
+        tag: 'LOCALHOST ONLY',
+        items: [
+          'localhost:8080',
+          'Only you can reach it',
+          'No real users',
+          'No 24/7 availability',
+        ],
+      },
+    ],
+    speakerNotes: [
+      'Here is the full API surface of AquaFlow after deployment.',
+      'Sixteen controllers across four domains: auth, field management, irrigation control, and IoT telemetry.',
+      'Before deployment, none of this is reachable by anyone except you on your own machine.',
+      'After deployment, every one of these endpoints is live, secured, and ready for the Flutter app to consume.',
+      'This is what we mean when we say deployment matters.',
     ],
   },
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { SlideData } from '@/lib/presentation/types';
 import { StatementSlide } from './primitives/StatementSlide';
 import { SectionHeaderSlide } from './primitives/SectionHeaderSlide';
@@ -12,6 +12,7 @@ import { CaseStudySlide } from './primitives/CaseStudySlide';
 import { ClosingTakeawaySlide } from './primitives/ClosingTakeawaySlide';
 import { ImageSlide } from './primitives/ImageSlide';
 import { SocialsSlide } from './primitives/SocialsSlide';
+import { CodeCompareSlide } from './primitives/CodeCompareSlide';
 import { NavigationBar } from './NavigationBar';
 import { useSlideControls } from '@/lib/presentation/useSlideControls';
 
@@ -21,19 +22,25 @@ interface PresentationViewportProps {
   role?: 'presenter' | 'audience' | 'remote';
 }
 
+const ZOOM_STEP = 0.1;
+const ZOOM_MIN  = 0.5;
+const ZOOM_MAX  = 2.0;
+const ZOOM_DEFAULT = 1.0;
+
 export function renderSlide(slide: SlideData) {
   switch (slide.type) {
-    case 'statement':       return <StatementSlide slide={slide} />;
-    case 'section-header':  return <SectionHeaderSlide slide={slide} />;
-    case 'text-visual':     return <TextVisualSlide slide={slide} />;
-    case 'architecture':    return <ArchitectureDiagramSlide slide={slide} />;
-    case 'comparison':      return <ComparisonSlide slide={slide} />;
-    case 'question-reveal': return <QuestionRevealSlide slide={slide} />;
-    case 'case-study':      return <CaseStudySlide slide={slide} />;
-    case 'closing-takeaway':return <ClosingTakeawaySlide slide={slide} />;
-    case 'image':           return <ImageSlide slide={slide} />;
-    case 'socials':         return <SocialsSlide slide={slide} />;
-    default:                return <div>Unsupported slide type</div>;
+    case 'statement':        return <StatementSlide slide={slide} />;
+    case 'section-header':   return <SectionHeaderSlide slide={slide} />;
+    case 'text-visual':      return <TextVisualSlide slide={slide} />;
+    case 'architecture':     return <ArchitectureDiagramSlide slide={slide} />;
+    case 'comparison':       return <ComparisonSlide slide={slide} />;
+    case 'question-reveal':  return <QuestionRevealSlide slide={slide} />;
+    case 'case-study':       return <CaseStudySlide slide={slide} />;
+    case 'closing-takeaway': return <ClosingTakeawaySlide slide={slide} />;
+    case 'image':            return <ImageSlide slide={slide} />;
+    case 'socials':          return <SocialsSlide slide={slide} />;
+    case 'code-compare':     return <CodeCompareSlide slide={slide} />;
+    default:                 return <div>Unsupported slide type</div>;
   }
 }
 
@@ -51,8 +58,13 @@ export function PresentationViewport({ slides, initialSlide = 0, role = 'present
     progressPercent,
   } = useSlideControls({ totalSlides: slides.length, initialSlide, role });
 
+  const [zoom, setZoom] = useState(ZOOM_DEFAULT);
+  const zoomIn    = useCallback(() => setZoom(z => Math.min(ZOOM_MAX,  +(z + ZOOM_STEP).toFixed(1))), []);
+  const zoomOut   = useCallback(() => setZoom(z => Math.max(ZOOM_MIN,  +(z - ZOOM_STEP).toFixed(1))), []);
+  const zoomReset = useCallback(() => setZoom(ZOOM_DEFAULT), []);
+
   const activeSlide = slides[currentSlide];
-  const isAudience = role === 'audience';
+  const isAudience  = role === 'audience';
   const NAV_H = 58;
 
   return (
@@ -70,11 +82,44 @@ export function PresentationViewport({ slides, initialSlide = 0, role = 'present
             backgroundSize: '40px 40px',
           }}
         />
-        <div className="relative z-10 w-full h-full overflow-y-auto overflow-x-hidden flex items-center justify-center px-4 py-4">
-          {activeSlide && (
-            <div key={activeSlide.id} className="w-full">{renderSlide(activeSlide)}</div>
-          )}
+        {/* Zoom wrapper — scales the entire slide uniformly from the centre */}
+        <div className="relative z-10 w-full h-full overflow-hidden flex items-center justify-center">
+          <div
+            className="w-full h-full"
+            style={{
+              transform: `scale(${zoom})`,
+              transformOrigin: 'center center',
+            }}
+          >
+            {activeSlide && (
+              <div key={activeSlide.id} className="w-full h-full">{renderSlide(activeSlide)}</div>
+            )}
+          </div>
         </div>
+
+        {/* ── Zoom controls (hidden in audience mode) ── */}
+        {!isAudience && (
+          <div className="absolute top-3 right-3 z-30 flex items-center gap-1 bg-zinc-900/80 border border-zinc-700/60 rounded-lg px-1.5 py-1 backdrop-blur-sm shadow-lg">
+            <button
+              onClick={zoomOut}
+              disabled={zoom <= ZOOM_MIN}
+              title="Zoom out (−)"
+              className="w-6 h-6 flex items-center justify-center rounded text-zinc-300 hover:text-white hover:bg-zinc-700/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono text-sm font-bold"
+            >−</button>
+            <button
+              onClick={zoomReset}
+              title="Reset zoom"
+              className="px-1.5 h-6 flex items-center justify-center rounded text-zinc-400 hover:text-cyan-300 hover:bg-zinc-700/60 transition-colors font-mono"
+              style={{ fontSize: 10 }}
+            >{Math.round(zoom * 100)}%</button>
+            <button
+              onClick={zoomIn}
+              disabled={zoom >= ZOOM_MAX}
+              title="Zoom in (+)"
+              className="w-6 h-6 flex items-center justify-center rounded text-zinc-300 hover:text-white hover:bg-zinc-700/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono text-sm font-bold"
+            >+</button>
+          </div>
+        )}
       </main>
 
       {/* ── Nav bar (hidden in audience mode) ── */}

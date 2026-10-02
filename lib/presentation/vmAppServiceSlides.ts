@@ -73,6 +73,90 @@ export const vmAppServiceSlides: SlideData[] = [
   },
 
   {
+    id: 'vm-full-deployment',
+    title: 'VM: Full Deployment Walkthrough',
+    section: 'Azure Virtual Machine (IaaS)',
+    type: 'text-visual',
+    motifBadge: 'end-to-end: VM',
+    contentBlocks: [
+      {
+        heading: '1. Provision & Secure the VM',
+        bulleted: true,
+        body: [
+          'Create Ubuntu 22.04 LTS VM in Azure Portal — choose size (B2s is fine for a thesis).',
+          'Open inbound ports: 22 (SSH), 80 (HTTP), 443 (HTTPS) in the Network Security Group.',
+          'SSH in: ssh azureuser@<public-ip>',
+          'sudo apt update && sudo apt upgrade -y',
+        ],
+      },
+      {
+        heading: '2. Install Runtime & Deploy App',
+        bulleted: true,
+        body: [
+          'sudo apt install -y openjdk-21-jre-headless git',
+          'git clone https://github.com/<you>/aquaflow-api.git',
+          'cd aquaflow-api && ./mvnw package -DskipTests',
+          'Create /etc/systemd/system/aquaflow.service — sets WorkingDirectory, ExecStart=java -jar app.jar, Restart=always, EnvironmentFile=/etc/aquaflow.env',
+          'sudo systemctl enable --now aquaflow',
+        ],
+      },
+      {
+        heading: '3. Environment Variables',
+        bulleted: true,
+        body: [
+          'Create /etc/aquaflow.env — never commit this file.',
+          'DB_URL=jdbc:postgresql://localhost:5432/aquaflow',
+          'DB_USERNAME=aquaflow  |  DB_PASSWORD=<secret>',
+          'JWT_SECRET=<long-random-string>',
+          'SPRING_PROFILES_ACTIVE=prod',
+        ],
+      },
+      {
+        heading: '4. Nginx Reverse Proxy + SSL',
+        bulleted: true,
+        body: [
+          'sudo apt install -y nginx certbot python3-certbot-nginx',
+          'Create /etc/nginx/sites-available/aquaflow — server_name api.aquaflow.app; location / { proxy_pass http://127.0.0.1:8080; proxy_set_header Host $host; proxy_set_header X-Real-IP $remote_addr; }',
+          'sudo ln -s /etc/nginx/sites-available/aquaflow /etc/nginx/sites-enabled/',
+          'sudo certbot --nginx -d api.aquaflow.app  →  auto-issues & renews Let\'s Encrypt cert.',
+          'sudo systemctl reload nginx',
+        ],
+      },
+    ],
+    visualCards: [
+      {
+        title: 'DNS SETUP',
+        tag: 'REQUIRED FIRST',
+        items: [
+          'Copy VM public IP from Azure Portal',
+          'Add A record: api.aquaflow.app → <public-ip>',
+          'Wait for propagation (~5 min)',
+          'Then run certbot',
+        ],
+      },
+      {
+        title: 'VERIFY',
+        tag: 'SMOKE TEST',
+        items: [
+          'systemctl status aquaflow',
+          'curl http://localhost:8080/actuator/health',
+          'curl https://api.aquaflow.app/actuator/health',
+          'nginx -t && systemctl status nginx',
+        ],
+      },
+    ],
+    speakerNotes: [
+      'Here is the full end-to-end process for deploying AquaFlow on an Azure VM.',
+      'Step one: provision the VM, open the right ports in the Network Security Group — 22 for SSH, 80 and 443 for web traffic.',
+      'Step two: install Java, clone the repo, build the JAR, and register it as a systemd service so it restarts automatically on crash or reboot.',
+      'Step three: environment variables go in a separate file — /etc/aquaflow.env — never in the repo.',
+      'Step four: install Nginx as a reverse proxy. Your Spring Boot app listens on 8080 internally; Nginx listens on 443 and forwards traffic to it.',
+      'Certbot handles the SSL certificate from Let\'s Encrypt automatically — and renews it.',
+      'DNS has to be set up before certbot runs — point your A record at the VM public IP first.',
+    ],
+  },
+
+  {
     id: 'vm-dockerfile',
     title: 'Dockerfile: Define Your Runtime Once',
     section: 'Azure Virtual Machine (IaaS)',
@@ -222,6 +306,87 @@ export const vmAppServiceSlides: SlideData[] = [
       'You can deploy your application directly as code — React, Angular, Vue frontend, or Node.js, Python, Java, .NET backend.',
       'App Service natively supports multiple platforms and manages the underlying runtime on Linux or Windows.',
       'Azure will take care of the deployment process: pull the code, build the application, deploy it to the App Service environment.',
+    ],
+  },
+
+  {
+    id: 'app-service-full-deployment',
+    title: 'App Service: Full Deployment Walkthrough',
+    section: 'Azure App Service (PaaS)',
+    type: 'text-visual',
+    motifBadge: 'end-to-end: App Service',
+    contentBlocks: [
+      {
+        heading: '1. Create the App Service',
+        bulleted: true,
+        body: [
+          'Azure Portal → Create a resource → Web App.',
+          'Runtime stack: Java 21 (for Spring Boot) or Node 20 (for a JS frontend).',
+          'OS: Linux. Region: same as your database to avoid latency.',
+          'App Service Plan: B1 is enough for a thesis; scale up when needed.',
+        ],
+      },
+      {
+        heading: '2. Connect GitHub & Deploy',
+        bulleted: true,
+        body: [
+          'Deployment Center → Source: GitHub → authorize and select repo + branch.',
+          'Azure generates a GitHub Actions workflow file automatically.',
+          'Every push to main triggers a build and deploy — no manual steps.',
+          'For Spring Boot: Azure runs mvn package and deploys the JAR.',
+        ],
+      },
+      {
+        heading: '3. Environment Variables (Application Settings)',
+        bulleted: true,
+        body: [
+          'Settings → Environment Variables → add key-value pairs.',
+          'DB_URL, DB_USERNAME, DB_PASSWORD, JWT_SECRET, SPRING_PROFILES_ACTIVE=prod',
+          'These are injected as OS environment variables at runtime — never in code.',
+          'Slot settings: mark secrets as sticky so they don\'t swap with staging slots.',
+        ],
+      },
+      {
+        heading: '4. Custom Domain + Managed SSL',
+        bulleted: true,
+        body: [
+          'Custom domains → Add domain → enter api.aquaflow.app.',
+          'Azure gives you a verification TXT record — add it to your DNS provider.',
+          'Add an A record pointing api.aquaflow.app → App Service outbound IP.',
+          'Certificates → Managed certificate → Azure issues and renews SSL for free.',
+          'HTTPS Only toggle: ON — redirects all HTTP to HTTPS automatically.',
+        ],
+      },
+    ],
+    visualCards: [
+      {
+        title: 'CORS',
+        tag: 'REQUIRED FOR FLUTTER WEB',
+        items: [
+          'API → CORS settings',
+          'Add: https://app.aquaflow.app',
+          'Or: * for open access (dev only)',
+          'Spring: @CrossOrigin or WebMvcConfigurer',
+        ],
+      },
+      {
+        title: 'VERIFY',
+        tag: 'SMOKE TEST',
+        items: [
+          'Overview → Default domain → open in browser',
+          'GET /actuator/health → {"status":"UP"}',
+          'Log stream → watch live app logs',
+          'curl https://api.aquaflow.app/api/v1/alerts',
+        ],
+      },
+    ],
+    speakerNotes: [
+      'App Service removes the OS and Nginx layer entirely — but you still need to configure a few things.',
+      'Step one: create the Web App, pick the right runtime stack and region.',
+      'Step two: connect GitHub. Azure writes the Actions workflow for you — every push deploys automatically.',
+      'Step three: environment variables go in Application Settings, not in your code or repo.',
+      'Step four: custom domain and SSL. Azure issues a managed certificate for free — you just need to add the DNS records first.',
+      'CORS is easy to forget: if your Flutter web app is on a different domain, you must allow it explicitly.',
     ],
   },
 
