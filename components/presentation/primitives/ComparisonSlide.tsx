@@ -29,14 +29,14 @@ export function ComparisonSlide({ slide }: { slide: ComparisonSlideData }) {
         <div className="px-5 py-4 rounded-xl border border-zinc-600/60 bg-zinc-900/60">
           <div className="mb-3 pb-2 border-b border-zinc-700/60">
             <h3 className="text-2xl font-bold text-zinc-100 font-mono leading-tight">{slide.left.title}</h3>
-            {slide.left.subtitle && <p className="text-base font-mono text-zinc-400 mt-0.5">{slide.left.subtitle}</p>}
+            {slide.left.subtitle && <p className="text-sub font-mono text-zinc-400 mt-0.5">{slide.left.subtitle}</p>}
             {slide.left.tag && (
               <span className="mt-1.5 inline-block px-2.5 py-0.5 text-xs font-mono rounded bg-zinc-800 border border-zinc-600 text-zinc-300">{slide.left.tag}</span>
             )}
           </div>
           <ul className="flex flex-col gap-0">
             {slide.left.points.map((pt, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-zinc-200 text-[1.05rem] leading-[1.35] py-1.5 border-b border-zinc-800/60 last:border-0">
+              <li key={idx} className="flex items-start gap-2.5 text-zinc-200 text-sub leading-[1.35] py-1.5 border-b border-zinc-800/60 last:border-0">
                 <span className="font-mono text-zinc-500 shrink-0 mt-px">→</span>
                 <span>{pt}</span>
               </li>
@@ -48,14 +48,14 @@ export function ComparisonSlide({ slide }: { slide: ComparisonSlideData }) {
         <div className="px-5 py-4 rounded-xl border border-cyan-500/40 bg-cyan-950/15 shadow-[0_0_24px_rgba(6,182,212,0.07)]">
           <div className="mb-3 pb-2 border-b border-cyan-500/30">
             <h3 className="text-2xl font-bold text-cyan-200 font-mono leading-tight">{slide.right.title}</h3>
-            {slide.right.subtitle && <p className="text-base font-mono text-cyan-300/80 mt-0.5">{slide.right.subtitle}</p>}
+            {slide.right.subtitle && <p className="text-sub font-mono text-cyan-300/80 mt-0.5">{slide.right.subtitle}</p>}
             {slide.right.tag && (
               <span className="mt-1.5 inline-block px-2.5 py-0.5 text-xs font-mono rounded bg-cyan-950/70 border border-cyan-400/50 text-cyan-200">{slide.right.tag}</span>
             )}
           </div>
           <ul className="flex flex-col gap-0">
             {slide.right.points.map((pt, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-zinc-100 text-[1.05rem] leading-[1.35] py-1.5 border-b border-cyan-900/40 last:border-0">
+              <li key={idx} className="flex items-start gap-2.5 text-zinc-100 text-sub leading-[1.35] py-1.5 border-b border-cyan-900/40 last:border-0">
                 <span className="font-mono text-cyan-400 shrink-0 mt-px">✓</span>
                 <span>{pt}</span>
               </li>
@@ -66,7 +66,7 @@ export function ComparisonSlide({ slide }: { slide: ComparisonSlideData }) {
 
       {/* Takeaway */}
       {slide.takeaway && (
-        <div className="mt-3 px-5 py-3 rounded-lg bg-amber-950/30 border border-amber-500/40 text-center font-mono text-base text-amber-200 shadow-[0_0_16px_rgba(245,158,11,0.08)]">
+        <div className="mt-3 px-5 py-3 rounded-lg bg-amber-950/30 border border-amber-500/40 text-center font-mono text-sub text-amber-200 shadow-[0_0_16px_rgba(245,158,11,0.08)]">
           <span className="text-amber-400 font-bold mr-2">TAKEAWAY:</span>
           {slide.takeaway}
         </div>

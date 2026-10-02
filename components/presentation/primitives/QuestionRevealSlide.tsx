@@ -10,14 +10,19 @@ export function QuestionRevealSlide({ slide }: { slide: QuestionRevealSlideData 
     <div className="h-full flex flex-col justify-center px-10 lg:px-16 py-6 max-w-5xl mx-auto w-full animate-fadeIn overflow-hidden">
 
       <div className="shrink-0 mb-4 border-b border-zinc-800 pb-3">
-        <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-tight font-mono leading-snug">{slide.question}</h2>
+        {/* text-4xl, not text-5xl: the question is a 240-270 character paragraph,
+            not a title, and at 48px it consumed most of the slide box, leaving the
+            revealed card no room to grow. The root is justify-center +
+            overflow-hidden, so the card's border was sliced at both edges. 36px
+            matches every other slide's title. */}
+        <h2 className="text-4xl font-bold text-white tracking-tight font-mono leading-snug">{slide.question}</h2>
       </div>
 
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
         {slide.options.map((opt) => (
           <div
             key={opt.id}
-            className="flex items-center justify-between px-4 py-3 rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-200 font-mono text-[1.05rem] leading-snug"
+            className="flex items-center justify-between px-4 py-3 rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-200 font-mono text-sub leading-snug"
           >
             <span>{opt.label}</span>
             {opt.count && (
@@ -41,7 +46,7 @@ export function QuestionRevealSlide({ slide }: { slide: QuestionRevealSlideData 
               <div className="font-mono text-3xl font-bold text-emerald-300 mb-2">{slide.revealedAnswer}</div>
             )}
             {slide.explanation && (
-              <p className="text-[1.1rem] text-zinc-300 max-w-2xl mx-auto leading-[1.35]">{slide.explanation}</p>
+              <p className="text-sub text-zinc-300 max-w-2xl mx-auto leading-[1.35]">{slide.explanation}</p>
             )}
           </div>
         )}

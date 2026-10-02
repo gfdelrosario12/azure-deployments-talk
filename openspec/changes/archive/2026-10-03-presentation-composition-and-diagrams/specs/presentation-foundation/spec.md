@@ -1,11 +1,11 @@
 ## Purpose
 
-Defines the presentation system for the 'Still on localhost:8080? Not Anymore!' talk: full-screen slide navigation, the dark developer visual theme and type scale, the reusable slide layout primitives, the architecture diagram engine, viewport zoom, multi-role views, and speaker-notes delivery.
+Recovers the presentation-composition and diagram-engine work that was implemented but not recorded: consistent centred slide composition, a defined type scale with responsive subtext sizing, the collision-free architecture diagram engine, viewport zoom, three new slide primitives, and the browser tab identity. Also corrects the navigation model to match the implementation.
 
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Slide Navigation and State
-The system SHALL provide full-screen slide-deck navigation through keyboard shortcuts and on-screen controls, tracking the current slide index and rendering the matching slide.
+The system SHALL provide full-screen slide-deck navigation through keyboard shortcuts and on-screen controls, tracking the current slide index and rendering the matching slide. Navigation state is synchronized across same-browser windows and paired devices; URL-hash synchronization is not part of the implementation.
 
 #### Scenario: Advancing a slide
 - **WHEN** the user presses the Right Arrow key, Space bar, or PageDown key, or clicks the next control
@@ -30,12 +30,8 @@ The system SHALL render the deck with a dark developer theme: a near-black backg
 - **WHEN** any slide primitive renders body copy, summaries, or bullet points
 - **THEN** the system renders them at the `text-sub` size (21.6px) and captions or helper text at the `text-cap` size (16.8px), against headings that use the stock Tailwind steps
 
-#### Scenario: Anchoring the talk narrative
-- **WHEN** a slide or the navigation bar renders
-- **THEN** the system displays the `localhost:8080` motif badge and a `localhost` brand badge with a live indicator
-
 ### Requirement: Reusable Slide Layout Primitives
-The system SHALL provide a set of reusable slide primitives so the deck can compose statements, section headers, text-visual walkthroughs, architecture diagrams, comparisons, interactive question-and-reveal slides, case studies, closing takeaways, image slides, social link slides, and before/after code comparisons.
+The system SHALL provide a set of reusable slide primitives so the deck can compose statements, section headers, text-visual walkthroughs, architecture diagrams, comparisons, interactive question-and-reveal slides, case studies, closing takeaways, image slides, social link slides, and before/after code comparisons, each around a consistent centred composition.
 
 #### Scenario: Rendering a statement slide
 - **WHEN** a `statement` slide is active
@@ -62,7 +58,7 @@ The system SHALL provide a set of reusable slide primitives so the deck can comp
 - **THEN** the system renders a headline, the speaker identity card, and a grid of social link cards and the presentation card, each with a QR code
 
 ### Requirement: Architecture Diagram Engine
-The system SHALL render architecture slides as a vector diagram in which nodes are colour-coded cards and edges are routed connectors that never cross an unrelated card.
+The system SHALL render architecture slides as a vector diagram in which nodes are colour-coded cards and edges are routed connectors that never cross an unrelated card. (Replaces the earlier progressive sub-step reveal behaviour, which the implementation does not provide; diagrams render in full.)
 
 #### Scenario: Laying out diagram nodes
 - **WHEN** an `architecture` slide renders its diagram
@@ -84,57 +80,29 @@ The system SHALL render architecture slides as a vector diagram in which nodes a
 - **WHEN** the diagram paints
 - **THEN** the system paints edges first, then edge labels, then node cards, so connectors sit behind the components they connect
 
-#### Scenario: Rendering a containerized variation
-- **WHEN** an architecture slide provides a secondary diagram
-- **THEN** the system renders it below the primary diagram under a "Containerized Variation" heading
+#### Scenario: Re-laying-out a diagram
+- **WHEN** the diagram container is resized
+- **THEN** the system re-measures the container and re-lays-out and re-routes the diagram to fill the new aspect ratio
+
+## ADDED Requirements
 
 ### Requirement: Responsive Composition and Subtext Sizing
-The system SHALL keep every slide composition within the viewport: dense text-visual slides step their body-copy size down a fixed ladder only while the slide is actually overflowing, and the diagram engine re-lays-out when its container changes size.
+The system SHALL keep every slide composition within the viewport: dense text-visual slides step their body-copy size down a fixed ladder only while the slide is actually overflowing.
 
 #### Scenario: Fitting a dense slide
 - **WHEN** a `text-visual` slide's content is taller than the viewport
 - **THEN** the system reduces the subtext size one step at a time down the ladder (21.6, 20, 18, 16.8, 15.4 px) and stops at the 15.4px floor rather than clipping content
 
-#### Scenario: Re-laying-out a diagram
-- **WHEN** the diagram container is resized
-- **THEN** the system re-measures the container and re-lays-out and re-routes the diagram to fill the new aspect ratio
-
 ### Requirement: Viewport Zoom
 The system SHALL let the presenter zoom the slide stage uniformly between 0.5x and 2.0x in 0.1 steps, scaled from the centre, with an on-screen zoom control that shows the current zoom percentage.
 
 #### Scenario: Zooming the stage
-- **WHEN** the presenter uses the zoom controls or their keyboard equivalent
+- **WHEN** the presenter uses the zoom controls
 - **THEN** the system scales the entire slide uniformly from its centre and clamps the zoom between the minimum and maximum
 
 #### Scenario: Hiding chrome for the audience
 - **WHEN** the deck is in audience mode
-- **THEN** the system hides the zoom controls, the navigation bar, and the speaker-notes drawer
-
-### Requirement: Multi-Role Presentation Views
-The system SHALL support three roles — presenter, audience, and remote — where the presenter and remote can drive navigation, the audience view is read-only, and navigation state is synchronized across same-browser windows and across devices.
-
-#### Scenario: Rendering the presenter console
-- **WHEN** the presenter opens the presenter view
-- **THEN** the system renders the current slide preview, the next slide thumbnail, a jump-to control, the speaker notes, a slide strip, and the remote pairing panel
-
-#### Scenario: Rendering the read-only audience view
-- **WHEN** a viewer opens the audience view
-- **THEN** the system renders the current slide full-screen with no navigation, zoom, or notes controls
-
-#### Scenario: Synchronizing navigation across windows and devices
-- **WHEN** the presenter advances a slide
-- **THEN** the system propagates the new slide index to other same-browser windows through a broadcast channel and to paired remote devices through the presentation session
-
-### Requirement: Speaker Notes Delivery
-The system SHALL carry per-slide speaker notes and present them to the presenter without displaying them on the audience view.
-
-#### Scenario: Showing speaker notes
-- **WHEN** the presenter toggles notes
-- **THEN** the system displays the current slide's notes in the presenter console and in an in-deck notes drawer
-
-#### Scenario: Withholding notes from the audience
-- **WHEN** the audience view is active
-- **THEN** the system does not render speaker notes
+- **THEN** the system hides the zoom controls
 
 ### Requirement: Browser Tab Title and Favicon
 The system SHALL set the browser tab title, meta description, and favicon for the presentation.

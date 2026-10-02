@@ -92,7 +92,7 @@ function CodePane({ label, code, variant }: { label: string; code: string; varia
         <span className={`font-mono text-xs uppercase tracking-widest px-2.5 py-1 rounded border ${badge} shrink-0 font-bold`}>
           {variant === 'before' ? '✗ BEFORE' : '✓ AFTER'}
         </span>
-        <span className="font-mono text-sm text-zinc-400 truncate">{label}</span>
+        <span className="font-mono text-cap text-zinc-400 truncate">{label}</span>
       </div>
       <div className="flex-1 min-h-0 px-4 py-3 overflow-hidden">
         <pre className="h-full font-mono" style={{ fontSize: fs, lineHeight: lh }}>
@@ -132,7 +132,7 @@ export function CodeCompareSlide({ slide }: { slide: CodeCompareSlideData }) {
       </div>
 
       {slide.summary && (
-        <p className="shrink-0 mb-3 text-[1.05rem] text-zinc-400 font-mono leading-[1.35]">{slide.summary}</p>
+        <p className="shrink-0 mb-3 text-sub text-zinc-400 font-mono leading-[1.35]">{slide.summary}</p>
       )}
 
       {/* Code panes — fill remaining height */}
@@ -142,7 +142,7 @@ export function CodeCompareSlide({ slide }: { slide: CodeCompareSlideData }) {
       </div>
 
       {slide.callout && (
-        <div className="shrink-0 mt-3 px-5 py-2.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 font-mono text-[1.05rem] text-cyan-200">
+        <div className="shrink-0 mt-3 px-5 py-2.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 font-mono text-sub text-cyan-200">
           ⚡ {slide.callout}
         </div>
       )}

@@ -15,14 +15,14 @@ export function CaseStudySlide({ slide }: { slide: CaseStudySlideData }) {
 
         <div className="px-4 py-3 rounded-lg border border-red-500/20 bg-red-950/10">
           <div className="font-mono text-xs text-red-400 uppercase mb-1.5 font-bold tracking-wider">Problem Statement</div>
-          <p className="text-zinc-200 text-[1.1rem] leading-[1.35]">{slide.problemStatement}</p>
+          <p className="text-zinc-200 text-sub leading-[1.35]">{slide.problemStatement}</p>
         </div>
 
         <div className="px-4 py-3 rounded-lg border border-zinc-800 bg-zinc-900/60">
           <div className="font-mono text-xs text-cyan-400 uppercase mb-2 font-bold tracking-wider">Solution Approach</div>
           <ul className="flex flex-col gap-0">
             {slide.solutionItems.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-3 text-zinc-300 text-[1.1rem] leading-[1.35] py-1.5 border-b border-zinc-800/60 last:border-0">
+              <li key={idx} className="flex items-start gap-3 text-zinc-300 text-sub leading-[1.35] py-1.5 border-b border-zinc-800/60 last:border-0">
                 <span className="font-mono text-cyan-400 select-none shrink-0 mt-px">▶</span>
                 <span>{item}</span>
               </li>
@@ -32,7 +32,7 @@ export function CaseStudySlide({ slide }: { slide: CaseStudySlideData }) {
 
         <div className="px-4 py-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20">
           <div className="font-mono text-xs text-emerald-400 uppercase mb-1.5 font-bold tracking-wider">Outcome</div>
-          <p className="text-emerald-200 font-mono text-[1.1rem] leading-[1.35]">{slide.outcome}</p>
+          <p className="text-emerald-200 font-mono text-sub leading-[1.35]">{slide.outcome}</p>
         </div>
       </div>
 

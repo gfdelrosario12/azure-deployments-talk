@@ -25,7 +25,7 @@ export function ArchitectureDiagramSlide({ slide }: { slide: ArchitectureSlideDa
       </div>
 
       {/* Summary — tight, no excess margin */}
-      <p className="shrink-0 text-[1.05rem] text-zinc-300 mb-3 leading-[1.35] max-w-5xl">{slide.summary}</p>
+      <p className="shrink-0 text-sub text-zinc-300 mb-3 leading-[1.35] max-w-5xl">{slide.summary}</p>
 
       {/* Diagram — fills remaining height */}
       <div className="flex-1 min-h-0 flex flex-col gap-3">
@@ -50,7 +50,7 @@ export function ArchitectureDiagramSlide({ slide }: { slide: ArchitectureSlideDa
             const text = typeof h === 'string' ? h : h.text;
             const logo = typeof h === 'string' ? undefined : h.logo;
             return (
-              <div key={idx} className="px-3 py-1.5 rounded bg-zinc-900/80 border border-purple-500/30 text-[1.05rem] font-mono text-zinc-100 flex items-center gap-2 shadow-[0_0_8px_rgba(168,85,247,0.08)]">
+              <div key={idx} className="px-3 py-1.5 rounded bg-zinc-900/80 border border-purple-500/30 text-sub font-mono text-zinc-100 flex items-center gap-2 shadow-[0_0_8px_rgba(168,85,247,0.08)]">
                 <span className="text-purple-400 shrink-0">❖</span>
                 {logo && (
                   <div className="relative w-4 h-4 shrink-0">

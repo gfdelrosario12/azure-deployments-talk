@@ -1,60 +1,64 @@
 ## Purpose
 
-Defines interactive case study puzzles, thesis callbacks, engineering philosophy conclusion slides, and the presentation outro.
+Defines the interactive case-study puzzles, the pragmatic engineering conclusion, the final localhost:8080 punchline, and the social-links outro that closes the talk.
 
 ## Requirements
 
 ### Requirement: Interactive Case Study Decision Puzzles
-The slide deck SHALL provide 6 distinct interactive decision puzzle case studies presenting realistic student thesis and engineering scenarios, each following a structured sequence: scenario presentation, multiple-choice options, pause prompt, revealed answer, micro-architecture diagram, and concise rationale.
+The slide deck SHALL provide 6 distinct interactive decision-puzzle case studies presenting realistic thesis and engineering scenarios, each rendered as a question-reveal slide with a structured sequence: scenario question, multiple-choice options, a reveal control, the revealed answer, and a concise rationale.
 
 #### Scenario: Navigating Case Study 1 (Simple Web Application)
 - **WHEN** the viewer reaches Case Study 1
-- **THEN** the deck presents a scenario with React frontend + Java Spring Boot REST API available 24/7 with low traffic and no desire to manage Linux OS, prompts for options (A. VM, B. App Service, C. AKS, D. Functions), reveals Answer B (Azure App Service), and displays the corresponding micro-architecture diagram with explanation.
+- **THEN** the deck presents a React frontend and Java Spring Boot REST API with a small user base, 24/7 availability, and no desire to manage Linux servers, Nginx, or OS patches; prompts options A. Azure Virtual Machine, B. Azure App Service, C. Azure Kubernetes Service, D. Azure Functions; reveals Answer B — Azure App Service; and explains that a conventional web app and REST API that should not require SSH, Nginx, or OS patching is the simplest full-stack PaaS option
 
-#### Scenario: Navigating Case Study 2 (Full Control)
+#### Scenario: Navigating Case Study 2 (Full OS Control)
 - **WHEN** the viewer reaches Case Study 2
-- **THEN** the deck presents a scenario requiring custom Linux distro, custom packages, networking, SSH, and manual Nginx reverse proxy with team Linux expertise, prompts for options (A. SWA, B. Functions, C. VM, D. Container Apps), reveals Answer C (Azure Virtual Machine), and displays the corresponding micro-architecture diagram with explanation.
+- **THEN** the deck presents a scenario requiring a specific Linux distribution, custom system-level packages, custom networking, full SSH access, and a manually configured Nginx reverse proxy by a team comfortable managing Linux servers; prompts options A. Azure Static Web Apps, B. Azure Functions, C. Azure Virtual Machine, D. Azure Container Apps; reveals Answer C — Azure Virtual Machine; and explains that only a VM provides OS-level control while Azure manages the hardware
 
 #### Scenario: Navigating Case Study 3 (Event-Driven API)
 - **WHEN** the viewer reaches Case Study 3
-- **THEN** the deck presents a scenario with a small calculation endpoint, 10 requests today scaling to 100,000 tomorrow, and no continuous backend requirement, prompts for options (A. VM, B. App Service, C. Functions, D. AKS), reveals Answer C (Azure Functions), and displays the corresponding micro-architecture diagram with explanation.
+- **THEN** the deck presents a calculation API endpoint that may receive 10 requests today and 100,000 tomorrow, with no desire to maintain a continuously running backend; prompts options A. Azure Virtual Machine, B. Azure App Service, C. Azure Functions, D. Azure Kubernetes Service; reveals Answer C — Azure Functions; and explains that the event-driven, variable workload executes only when triggered, scales automatically, and costs nothing when idle
 
 #### Scenario: Navigating Case Study 4 (Static Frontend + Serverless Backend)
 - **WHEN** the viewer reaches Case Study 4
-- **THEN** the deck presents a scenario with React frontend, lightweight HTTP operations, variable traffic, and serverless preference, prompts for options (A. VM + Nginx, B. SWA + Azure Functions, C. App Service + VM, D. AKS), reveals Answer B (Static Web Apps + Azure Functions), and displays the corresponding micro-architecture diagram with explanation.
+- **THEN** the deck presents a React frontend with small HTTP-based backend operations, no continuously running backend requirement, variable traffic, and a serverless preference; prompts options A. VM + Nginx, B. Static Web Apps + Azure Functions, C. App Service + VM, D. AKS + multiple containers; reveals Answer B — Static Web Apps + Azure Functions; and explains that Static Web Apps delivers the React frontend globally while Functions runs the backend on demand
 
-#### Scenario: Navigating Case Study 5 (Separate Frontend + Traditional Backend)
+#### Scenario: Navigating Case Study 5 (Independent Frontend and Backend Teams)
 - **WHEN** the viewer reaches Case Study 5
-- **THEN** the deck presents a scenario with Vue frontend and Java Spring Boot REST API released independently with a conventional 24/7 backend API, reveals Answer: Static Web Apps + App Service, and displays the corresponding micro-architecture diagram with explanation.
+- **THEN** the deck presents a Vue frontend and a Java Spring Boot REST API whose frontend and backend teams release on different schedules and need to deploy independently, with a conventional continuously-running API; prompts options A. Static Web Apps + App Service, B. Static Web Apps + Functions, C. Azure Functions only, D. Azure VM only; reveals Answer A — Static Web Apps + App Service; and explains that the frontend deploys independently to Static Web Apps while the continuously-running Java API deploys to App Service, and that Functions would not suit a continuously-running traditional API
 
 #### Scenario: Navigating Case Study 6 (Dockerized Thesis)
 - **WHEN** the viewer reaches Case Study 6
-- **THEN** the deck presents a scenario with Spring Boot backend, custom Dockerfile, custom Java runtime, container dependencies, and desire for containers without Kubernetes, reveals Answer: Azure App Service for Containers, and displays the corresponding micro-architecture diagram with explanation.
+- **THEN** the deck presents the same thesis application with a custom Dockerfile, custom Java runtime configuration, and container-specific dependencies, where the team wants to keep it containerized but does not need Kubernetes; prompts options A. Azure App Service for Containers, B. Azure Kubernetes Service, C. Azure Functions, D. Static Web Apps only; reveals Answer A — Azure App Service for Containers; and explains that App Service for Containers pulls the image from ACR and runs it with full Docker control and managed PaaS simplicity, while AKS would be overkill
 
-### Requirement: Thesis Callback and Solution Space
-The slide deck SHALL create a direct visual and narrative callback to the presentation opening, displaying "Your application works.", "It works on your machine.", "It works on localhost:8080.", "Now get it into the real world.", and framing the deployment spectrum as the developer's solution space.
+### Requirement: Pragmatic Engineering Conclusion
+The slide deck SHALL present the core engineering conclusion emphasising 'Keep It Simple, Stupid' (KISS) with the takeaways not to add complexity just because you can, and to start simple, deploy, learn, and scale when actually needed.
 
-#### Scenario: Displaying Thesis Callback
-- **WHEN** the user transitions from the case studies to the thesis wrap-up
-- **THEN** the deck displays the thesis callback sequence echoing the opening problem statement and connecting it to the cloud deployment spectrum.
-
-### Requirement: Pragmatic Engineering Conclusion and Principles
-The slide deck SHALL present the core engineering conclusion emphasizing "Keep It Simple, Stupid" (KISS), outlining the 5 core decision criteria (application requirements, team capabilities, infrastructure responsibility, scalability requirements, operational complexity), and emphasizing "Don't add complexity just because you can." and "Start simple, deploy, learn, and scale when you actually need to.".
-
-#### Scenario: Viewing Conclusion Principles
+#### Scenario: Viewing the conclusion principles
 - **WHEN** the viewer reaches the conclusion section
-- **THEN** the deck displays the KISS philosophy slide, the 5-point decision criteria breakdown, and the progressive scaling mindset.
+- **THEN** the deck displays a closing-takeaway slide titled 'Keep It Simple, Stupid' with the takeaways "Don't add complexity just because you can." (every layer of control is a layer you must patch, monitor, and maintain) and "Start simple, deploy, learn, and scale." (scale when you actually need to — not before, and not because it sounds impressive)
 
-### Requirement: Outro and Final Narrative Resolution
-The slide deck SHALL conclude with the KISS conclusion principles and the final punchline "Get your application off localhost:8080, for god’s sake.", followed by the outro slide ("Thank you so much, everyone!" and presenter social links with QR codes) visually mirroring the opening localhost slide as a completed journey to production.
+### Requirement: Final Punchline Callback
+The slide deck SHALL close the narrative with a direct callback to the opening localhost:8080 problem.
 
-#### Scenario: Reaching Presentation Outro
-- **WHEN** the viewer reaches the final presentation slides
-- **THEN** the deck displays the localhost punchline statement, followed by the contact/outro slide with speaker notes returning control to the event host.
+#### Scenario: Reaching the final punchline
+- **WHEN** the viewer transitions from the conclusion to the final statement
+- **THEN** the deck displays the statement "Get your application off localhost:8080, for god's sake." with the subtitle "It works on your machine. Now make it work for everyone else." and the `localhost:8080` motif badge
+
+### Requirement: Outro and Social Links
+The slide deck SHALL conclude with a social-links outro and a closing title that mirrors the opening slide.
+
+#### Scenario: Reaching the social-links outro
+- **WHEN** the viewer reaches the final slides
+- **THEN** the deck displays a socials slide with the headline "Thank you so much, everyone!", the subline inviting questions, the speaker identity card (Gladwin Ferdz I. Del Rosario, IT Service Desk Intern — Dayforce, Cloud-Focused Full-Stack Developer, BS CpE — Computer Networks Engineering, Polytechnic University of the Philippines), social link cards for the bio link, LinkedIn, Facebook, and portfolio (each with a QR code), and a presentation card linking to the live deck with its QR code
+
+#### Scenario: Reaching the closing title
+- **WHEN** the viewer reaches the closing title slide
+- **THEN** the deck displays the statement "Still on localhost? Not Anymore!" with the subtitle "Exploring Modern Deployment Methodologies with Microsoft Azure!", the AZUG Philippines and JUG Philippines logos, and the presentation link card — mirroring the opening slide as a completed journey to production
 
 ### Requirement: Complete Narration in Speaker Notes
-The slide deck SHALL embed verbatim presenter narration across all case study, thesis callback, and conclusion slides.
+The slide deck SHALL embed verbatim presenter narration across all case-study, conclusion, and outro slides.
 
-#### Scenario: Inspecting Final Presentation Speaker Notes
-- **WHEN** the presenter opens speaker notes on any case study or conclusion slide
-- **THEN** the complete, unabridged speech script is available in `speakerNotes`.
+#### Scenario: Inspecting final presentation speaker notes
+- **WHEN** the presenter opens speaker notes on any case-study, conclusion, or outro slide
+- **THEN** the complete, unabridged speech script is available in `speakerNotes`, including the per-case-study reasoning and the KISS conclusion narrative

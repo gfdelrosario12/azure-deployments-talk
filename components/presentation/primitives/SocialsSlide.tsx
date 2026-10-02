@@ -68,7 +68,7 @@ export function SocialsSlide({ slide }: { slide: SocialsSlideData }) {
             </div>
             <ul className="mt-1 space-y-0.5">
               {slide.speaker.titles.map((title) => (
-                <li key={title} className="font-mono text-base text-zinc-300 leading-snug">
+                <li key={title} className="font-mono text-cap text-zinc-300 leading-snug">
                   {title}
                 </li>
               ))}

@@ -18,7 +18,7 @@ export function ImageSlide({ slide }: { slide: ImageSlideData }) {
         />
       </div>
       {slide.image.caption && (
-        <p className="mt-4 text-zinc-400 font-mono text-sm text-center">
+        <p className="mt-4 text-zinc-400 font-mono text-cap text-center">
           {slide.image.caption}
         </p>
       )}

@@ -23,7 +23,7 @@ export function ClosingTakeawaySlide({ slide }: { slide: ClosingTakeawaySlideDat
               <span className="font-mono text-xs text-cyan-400 font-bold uppercase shrink-0">{`// 0${idx + 1}`}</span>
               <h3 className="text-2xl font-bold text-white font-mono leading-tight">{takeaway.title}</h3>
             </div>
-            <p className="text-[1.1rem] text-zinc-300 leading-[1.35] pl-10">{takeaway.description}</p>
+            <p className="text-sub text-zinc-300 leading-[1.35] pl-10">{takeaway.description}</p>
           </div>
         ))}
       </div>

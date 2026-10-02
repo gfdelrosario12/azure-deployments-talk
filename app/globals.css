@@ -10,6 +10,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Presentation type scale. Headings use the stock Tailwind steps (xl through
+     7xl) and are deliberately not tokenised, so subtext can grow without the
+     heading/subtext ratio drifting apart.
+
+       text-sub   body copy, summaries, bullet points, the things a room reads
+       text-cap   captions, helper text, secondary descriptions under a heading
+
+     Both are tuned for 1:1 projection at ZOOM_DEFAULT (see PresentationViewport):
+     subtext is 21.6px against a 36px heading, a 1.67:1 ratio. */
+  --text-sub: 1.35rem;
+  --text-cap: 1.05rem;
 }
 
 @media (prefers-color-scheme: dark) {
