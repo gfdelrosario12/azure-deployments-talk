@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DiagramData } from '@/lib/presentation/types';
 
 // ── colours ──────────────────────────────────────────────────────────────────
@@ -32,13 +32,21 @@ function wrapText(text: string, maxPx: number, charPx: number): string[] {
 }
 
 // ── layout ────────────────────────────────────────────────────────────────────
-const MAX_COLS = 4;
+// Diagrams are laid out from the BFS depth of every node. The number of columns
+// per band is chosen so the finished drawing best fills the box it is given, which
+// keeps every slide on the same composition: heading, summary, one diagram block
+// that fills the middle, highlights.
 
-function layout(
-  nodes: DiagramData['nodes'],
-  edges: DiagramData['edges'],
-  NW: number, NH: number, CGAP: number, RGAP: number,
-) {
+/** Aspect ratio assumed until the real box has been measured. */
+const DEFAULT_ASPECT = 0.47;
+
+const NW   = 160;
+const NH   = 68;
+const CGAP = 88;
+const RGAP = 24;
+const PAD  = 16;
+
+function bfsColumns(nodes: DiagramData['nodes'], edges: DiagramData['edges']) {
   const inDeg: Record<string, number> = {};
   nodes.forEach((n) => (inDeg[n.id] = 0));
   edges.forEach((e) => (inDeg[e.to] = (inDeg[e.to] ?? 0) + 1));
@@ -56,54 +64,72 @@ function layout(
     });
   }
   nodes.forEach((n) => { if (colOf[n.id] === undefined) colOf[n.id] = 0; });
+  return colOf;
+}
 
-  const numBfsCols = Math.max(...Object.values(colOf)) + 1;
-  const effectiveColOf = { ...colOf };
-  const effectiveRowOf: Record<string, number> = {};
-  let numCols: number;
+/** Places the nodes on `numCols` columns, wrapped into at most two bands. */
+function place(nodes: DiagramData['nodes'], edges: DiagramData['edges'], numCols: number) {
+  const colOf = bfsColumns(nodes, edges);
+  const numBfsCols = Math.max(...Object.values(colOf), 0) + 1;
 
-  if (numBfsCols > MAX_COLS) {
-    const half = Math.ceil(numBfsCols / 2);
-    nodes.forEach((n) => {
-      const bc = colOf[n.id];
-      effectiveColOf[n.id] = bc < half ? bc : bc - half;
-      effectiveRowOf[n.id] = bc < half ? 0 : 1;
-    });
-    numCols = half;
-  } else {
-    const colGroups: Record<number, string[]> = {};
-    nodes.forEach((n) => { const c = colOf[n.id]; (colGroups[c] = colGroups[c] ?? []).push(n.id); });
-    Object.values(colGroups).forEach((ids) => ids.forEach((id, i) => (effectiveRowOf[id] = i)));
-    numCols = numBfsCols;
-  }
+  const colNodes: Record<number, string[]> = {};
+  nodes.forEach((n) => { const c = colOf[n.id]; (colNodes[c] = colNodes[c] ?? []).push(n.id); });
+
+  const stackH = (k: number) => k * NH + Math.max(0, k - 1) * RGAP;
+
+  // Split the flow into a leading band and a trailing band, at most numCols wide.
+  const head = Math.max(numCols, numBfsCols - numCols);
+  const bands = [head, numBfsCols - head]
+    .map((len, i) => Array.from({ length: Math.max(0, len) }, (_, j) => (i === 0 ? j : head + j)))
+    .filter((b) => b.length > 0);
+
+  const BAND_GAP = RGAP * 3;
+  const bandH = bands.map((b) => Math.max(...b.map((c) => stackH((colNodes[c] ?? []).length))));
 
   const cx: Record<string, number> = {};
   const cy: Record<string, number> = {};
-
-  if (numBfsCols > MAX_COLS) {
-    const BAND_GAP = RGAP * 3;
-    nodes.forEach((n) => {
-      cx[n.id] = effectiveColOf[n.id] * (NW + CGAP) + NW / 2;
-      cy[n.id] = effectiveRowOf[n.id] * (NH + BAND_GAP) + NH / 2;
+  let bandTop = 0;
+  bands.forEach((band, bi) => {
+    band.forEach((c, j) => {
+      const ids = colNodes[c] ?? [];
+      const top = bandTop + (bandH[bi] - stackH(ids.length)) / 2;
+      ids.forEach((id, r) => {
+        cx[id] = j * (NW + CGAP) + NW / 2;
+        cy[id] = top + r * (NH + RGAP) + NH / 2;
+      });
     });
-  } else {
-    const colGroups: Record<number, string[]> = {};
-    nodes.forEach((n) => { const c = effectiveColOf[n.id]; (colGroups[c] = colGroups[c] ?? []).push(n.id); });
-    const maxRows = Math.max(...Object.values(effectiveRowOf), 0) + 1;
-    const totalH = maxRows * NH + (maxRows - 1) * RGAP;
-    nodes.forEach((n) => {
-      const c = effectiveColOf[n.id], r = effectiveRowOf[n.id];
-      const stackSize = colGroups[c].length;
-      const stackH = stackSize * NH + (stackSize - 1) * RGAP;
-      const topOffset = (totalH - stackH) / 2;
-      cx[n.id] = c * (NW + CGAP) + NW / 2;
-      cy[n.id] = topOffset + r * (NH + RGAP) + NH / 2;
-    });
-  }
+    bandTop += bandH[bi] + BAND_GAP;
+  });
 
   const totalW = numCols * NW + (numCols - 1) * CGAP;
-  const totalH = Math.max(...Object.values(cy), 0) + NH / 2;
-  return { cx, cy, totalW, totalH };
+  const totalH = bandH.reduce((sum, h) => sum + h, 0) + BAND_GAP * (bands.length - 1);
+
+  // Backward edges arc over the top, so leave room for them.
+  const extraTopPad = edges.some(
+    (e) => cx[e.from] !== undefined && cx[e.to] !== undefined && cx[e.to] <= cx[e.from],
+  ) ? NH + 16 : 0;
+
+  return {
+    cx, cy,
+    vw: totalW + PAD * 2,
+    vh: totalH + PAD * 2 + extraTopPad,
+  };
+}
+
+/** Picks the column count whose drawing covers the most of a `boxAspect` box. */
+function layout(nodes: DiagramData['nodes'], edges: DiagramData['edges'], boxAspect: number) {
+  const numBfsCols = Math.max(...Object.values(bfsColumns(nodes, edges)), 0) + 1;
+
+  let best = place(nodes, edges, numBfsCols);
+  let bestFill = 0;
+  for (let numCols = Math.max(1, Math.ceil(numBfsCols / 2)); numCols <= numBfsCols; numCols++) {
+    const plan = place(nodes, edges, numCols);
+    // Fraction of the box the scaled drawing covers.
+    const scale = Math.min(1 / plan.vw, boxAspect / plan.vh);
+    const fill = Math.min(1, plan.vw * scale) * Math.min(1, (plan.vh * scale) / boxAspect);
+    if (fill > bestFill) { bestFill = fill; best = plan; }
+  }
+  return best;
 }
 
 // ── edge routing ──────────────────────────────────────────────────────────────
@@ -192,10 +218,6 @@ function routeEdge(
 export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
   const { nodes, edges } = diagram;
 
-  const NW   = 160;
-  const NH   = 68;
-  const CGAP = 88;
-  const RGAP = 24;
   const HPAD = 10;
   const textW = NW - HPAD * 2;
 
@@ -206,7 +228,25 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
   const TYPE_FS   = 6.5;
   const ICON_SIZE = 16;
 
-  const { cx, cy, totalW, totalH } = layout(nodes, edges, NW, NH, CGAP, RGAP);
+  // The diagram block fills the space the slide gives it; the drawing is then
+  // scaled to fit that box and centred inside it.
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [boxAspect, setBoxAspect] = useState(DEFAULT_ASPECT);
+
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const measure = () => {
+      const { width, height } = el.getBoundingClientRect();
+      if (width > 0 && height > 0) setBoxAspect(height / width);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const { cx, cy, vw, vh } = useMemo(() => layout(nodes, edges, boxAspect), [nodes, edges, boxAspect]);
 
   // Count outgoing edges per source node for stagger calculation
   const outCount: Record<string, number> = {};
@@ -224,18 +264,13 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
     return cx[e.to] <= cx[e.from]; // backward or same-column-up
   }) ? NH + 16 : 0;
 
-  const PAD = 16;
-  const vw = totalW + PAD * 2;
-  const vh = totalH + PAD * 2 + extraTopPad;
   const ox = PAD;
   const oy = PAD + extraTopPad; // shift nodes down to make room for arcs above
 
-  const minHeightPx = NH + PAD * 2 + 40;
-
   return (
     <div
-      className="w-full bg-zinc-950/90 border border-zinc-800 rounded-xl relative overflow-hidden shadow-xl"
-      style={{ minHeight: minHeightPx }}
+      ref={boxRef}
+      className="w-full h-full bg-zinc-950/90 border border-zinc-800 rounded-xl relative overflow-hidden shadow-xl"
     >
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -244,6 +279,7 @@ export function DiagramEngine({ diagram }: { diagram: DiagramData }) {
       <svg
         viewBox={`0 0 ${vw} ${vh}`}
         width="100%"
+        height="100%"
         style={{ display: 'block' }}
         xmlns="http://www.w3.org/2000/svg"
       >

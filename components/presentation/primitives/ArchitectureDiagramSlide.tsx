@@ -34,9 +34,11 @@ export function ArchitectureDiagramSlide({ slide }: { slide: ArchitectureSlideDa
         </div>
 
         {slide.secondaryDiagram && (
-          <div className="shrink-0 pt-2 border-t border-zinc-700/60">
-            <div className="font-mono text-xs text-zinc-400 uppercase mb-2">// Containerized Variation</div>
-            <DiagramEngine diagram={slide.secondaryDiagram} />
+          <div className="flex-1 min-h-0 flex flex-col pt-2 border-t border-zinc-700/60">
+            <div className="shrink-0 font-mono text-xs text-zinc-400 uppercase mb-2">// Containerized Variation</div>
+            <div className="flex-1 min-h-0">
+              <DiagramEngine diagram={slide.secondaryDiagram} />
+            </div>
           </div>
         )}
       </div>
